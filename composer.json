@@ -1,0 +1,25 @@
+{
+    "name": "butterfly/form",
+    "type": "library",
+    "description": "Butterfly PHP. Form Component",
+    "keywords": ["Form"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Marat Fakhertdinov",
+            "email": "marat.fakhertdinov@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3",
+
+        "butterfly/validation": "1.0.*",
+        "butterfly/transform": "1.0.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Butterfly\\Component\\Form\\": "src/",
+            "Butterfly\\Component\\Form\\Tests\\": "tests/"
+        }
+    }
+}
