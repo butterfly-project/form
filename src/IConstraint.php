@@ -30,4 +30,14 @@ interface IConstraint
      * @return void
      */
     public function setParent(ArrayConstraint $parent);
+
+    /**
+     * @return mixed
+     */
+    public function getValue();
+
+    /**
+     * @return mixed
+     */
+    public function getOldValue();
 }

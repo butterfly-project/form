@@ -182,4 +182,29 @@ class ArrayConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
         unset($constraint['abc']);
     }
 
+    public function testGetValues()
+    {
+        $inputArr = array(
+            'key1' => 'abcde',
+            'key2' => 'abcde',
+        );
+
+        $expectedArr = array(
+            'key1' => 'ab',
+            'key2' => 'ab',
+        );
+
+        $constraint = ArrayConstraint::create()
+            ->addScalarConstraint('key1')
+                ->addTransformer(new StringMaxLength(2))
+            ->end()
+            ->addScalarConstraint('key2')
+                ->addTransformer(new StringMaxLength(2))
+            ->end();
+
+        $constraint->filter($inputArr);
+
+        $this->assertEquals($inputArr, $constraint->getOldValue());
+        $this->assertEquals($expectedArr, $constraint->getValue());
+    }
 }
