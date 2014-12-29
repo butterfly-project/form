@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+1.0.2
+-----
+
+Added functionality:
+
+ * Runtime edit constraint in Callable validator and transform 
+
 1.0.1
 -----
 
