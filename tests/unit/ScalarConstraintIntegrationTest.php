@@ -121,4 +121,40 @@ class ScalarConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($constraint->isValid());
     }
+
+    public function getDataForTestGetFormInValidator()
+    {
+        return array(
+            array(array('username' => 'a', 'password' => 'b'), false, 3),
+            array(array('username' => 'user1', 'password' => 'pass'), false, 1),
+            array(array('username' => 'admin', 'password' => 'admin'), true, 0),
+        );
+    }
+
+    /**
+     * @dataProvider getDataForTestGetFormInValidator
+     *
+     * @param array $value
+     * @param bool $expectedResult
+     * @param int $countErrors
+     */
+    public function testGetFormInValidator(array $value, $expectedResult, $countErrors)
+    {
+        $constraint = ArrayConstraint::create()
+            ->addScalarConstraint('username')
+                ->addValidator(new StringLengthGreat(2))
+            ->end()
+            ->addScalarConstraint('password')
+                ->addValidator(new StringLengthGreat(2))
+                ->addCallableValidator(function($value, ScalarConstraint $constraint) {
+                    return $value == $constraint->getParent()->get('username')->getValue();
+                })
+            ->end()
+        ;
+
+        $constraint->filter($value);
+
+        $this->assertEquals($expectedResult, $constraint->isValid());
+        $this->assertCount($countErrors, $constraint->getErrorMessages());
+    }
 }

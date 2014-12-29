@@ -79,7 +79,16 @@ class ScalarConstraint implements IConstraint
      */
     public function addCallableValidator($validator, $message = '', $isNegative = false, $isFatal = false)
     {
-        return $this->addValidator(new CallableValidatorAdapter($validator), $message, $isNegative, $isFatal);
+        return $this->addValidator(new CallableValidatorAdapter($validator, $this), $message, $isNegative, $isFatal);
+    }
+
+    /**
+     * @param callable $transformer
+     * @return ScalarConstraint
+     */
+    public function addCallableTransformer($transformer)
+    {
+        return $this->addTransformer(new CallableTransformerAdapter($transformer, $this));
     }
 
     /**
@@ -94,15 +103,6 @@ class ScalarConstraint implements IConstraint
         $this->filters[] = new ValidatorChainAdapter($validator, $message, $isNegative, $isFatal);
 
         return $this;
-    }
-
-    /**
-     * @param callable $transformer
-     * @return ScalarConstraint
-     */
-    public function addCallableTransformer($transformer)
-    {
-        return $this->addTransformer(new CallableTransformerAdapter($transformer));
     }
 
     /**
@@ -129,7 +129,7 @@ class ScalarConstraint implements IConstraint
                 $value = $filter->transform($value);
 
             } elseif ($filter instanceof ValidatorChainAdapter) {
-                if ($filter->check($value)) {
+                if ($filter->check($value, $this)) {
                     continue;
                 }
 

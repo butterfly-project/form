@@ -2,6 +2,7 @@
 
 namespace Butterfly\Component\Form\Adapter;
 
+use Butterfly\Component\Form\IConstraint;
 use Butterfly\Component\Validation\IValidator;
 
 class CallableValidatorAdapter implements IValidator
@@ -12,11 +13,18 @@ class CallableValidatorAdapter implements IValidator
     protected $validator;
 
     /**
-     * @param callable $validator
+     * @var IConstraint
      */
-    public function __construct($validator)
+    protected $constraint;
+
+    /**
+     * @param callable $validator
+     * @param IConstraint $constraint
+     */
+    public function __construct($validator, IConstraint $constraint)
     {
-        $this->validator = $validator;
+        $this->validator  = $validator;
+        $this->constraint = $constraint;
     }
 
     /**
@@ -26,6 +34,6 @@ class CallableValidatorAdapter implements IValidator
      */
     public function check($value)
     {
-        return call_user_func($this->validator, $value);
+        return call_user_func($this->validator, $value, $this->constraint);
     }
 }

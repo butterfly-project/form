@@ -2,6 +2,7 @@
 
 namespace Butterfly\Component\Form\Adapter;
 
+use Butterfly\Component\Form\IConstraint;
 use Butterfly\Component\Transform\ITransformer;
 
 class CallableTransformerAdapter implements ITransformer
@@ -12,11 +13,18 @@ class CallableTransformerAdapter implements ITransformer
     protected $transformer;
 
     /**
-     * @param callable $transformer
+     * @var IConstraint
      */
-    public function __construct($transformer)
+    protected $constraint;
+
+    /**
+     * @param callable $transformer
+     * @param IConstraint $constraint
+     */
+    public function __construct($transformer, IConstraint $constraint)
     {
         $this->transformer = $transformer;
+        $this->constraint  = $constraint;
     }
 
     /**
@@ -26,6 +34,6 @@ class CallableTransformerAdapter implements ITransformer
      */
     public function transform($value)
     {
-        return call_user_func($this->transformer, $value);
+        return call_user_func($this->transformer, $value, $this->constraint);
     }
 }
