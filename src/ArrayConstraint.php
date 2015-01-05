@@ -161,24 +161,19 @@ class ArrayConstraint implements IConstraint, \Countable, \IteratorAggregate, \A
      */
     public function getOldValue()
     {
-        $values = array();
-
-        foreach ($this->constraints as $key => $constraint) {
-            $values[$key] = $constraint->getOldValue();
-        }
-
-        return $values;
+        return $this->getValue(IConstraint::VALUE_BEFORE);
     }
 
     /**
+     * @param mixed $label
      * @return array
      */
-    public function getValue()
+    public function getValue($label = IConstraint::VALUE_AFTER)
     {
         $values = array();
 
         foreach ($this->constraints as $key => $constraint) {
-            $values[$key] = $constraint->getValue();
+            $values[$key] = $constraint->getValue($label);
         }
 
         return $values;

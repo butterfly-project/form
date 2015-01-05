@@ -4,6 +4,7 @@ namespace Butterfly\Component\Form\Tests;
 
 use Butterfly\Component\Form\ArrayConstraint;
 use Butterfly\Component\Form\IConstraint;
+use Butterfly\Component\Form\ScalarConstraint;
 use Butterfly\Component\Transform\String\StringMaxLength;
 use Butterfly\Component\Transform\String\StringTrim;
 use Butterfly\Component\Validation\String\StringLengthGreat;
@@ -206,5 +207,41 @@ class ArrayConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($inputArr, $constraint->getOldValue());
         $this->assertEquals($expectedArr, $constraint->getValue());
+    }
+
+    public function getDataForTestGetFormInValidator()
+    {
+        return array(
+            array(array('username' => 'a', 'password' => 'b'), false, 3),
+            array(array('username' => 'user1', 'password' => 'pass'), false, 1),
+            array(array('username' => 'admin', 'password' => 'admin'), true, 0),
+        );
+    }
+
+    /**
+     * @dataProvider getDataForTestGetFormInValidator
+     *
+     * @param array $value
+     * @param bool $expectedResult
+     * @param int $countErrors
+     */
+    public function testGetFormInValidator(array $value, $expectedResult, $countErrors)
+    {
+        $constraint = ArrayConstraint::create()
+            ->addScalarConstraint('username')
+            ->addValidator(new StringLengthGreat(2))
+            ->end()
+            ->addScalarConstraint('password')
+            ->addValidator(new StringLengthGreat(2))
+            ->addCallableValidator(function($value, ScalarConstraint $constraint) {
+                return $value == $constraint->getParent()->get('username')->getValue();
+            })
+            ->end()
+        ;
+
+        $constraint->filter($value);
+
+        $this->assertEquals($expectedResult, $constraint->isValid());
+        $this->assertCount($countErrors, $constraint->getErrorMessages());
     }
 }

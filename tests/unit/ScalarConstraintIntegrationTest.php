@@ -3,9 +3,11 @@
 namespace Butterfly\Component\Form\Tests;
 
 use Butterfly\Component\Form\ArrayConstraint;
+use Butterfly\Component\Form\IConstraint;
 use Butterfly\Component\Form\ScalarConstraint;
 use Butterfly\Component\Transform\String\StringMaxLength;
 use Butterfly\Component\Transform\String\StringTrim;
+use Butterfly\Component\Validation\Compare;
 use Butterfly\Component\Validation\IsNull;
 use Butterfly\Component\Validation\String\StringLengthGreat;
 use Butterfly\Component\Validation\String\StringLengthGreatOrEqual;
@@ -19,8 +21,23 @@ class ScalarConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
             ->addTransformer(new StringTrim())
             ->filter(' abc ');
 
-        $this->assertEquals('abc', $constraint->getValue());
         $this->assertEquals(' abc ', $constraint->getOldValue());
+        $this->assertEquals(' abc ', $constraint->getValue(IConstraint::VALUE_BEFORE));
+
+        $this->assertEquals('abc', $constraint->getValue());
+        $this->assertEquals('abc', $constraint->getValue(IConstraint::VALUE_AFTER));
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testGetValueIfIncorrectLabel()
+    {
+        $constraint = ScalarConstraint::create()
+            ->addTransformer(new StringTrim())
+            ->filter(' abc ');
+
+        $constraint->getValue('undefined');
     }
 
     public function testCallableTransformer()
@@ -122,39 +139,50 @@ class ScalarConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($constraint->isValid());
     }
 
-    public function getDataForTestGetFormInValidator()
+    public function testSaveValue()
     {
-        return array(
-            array(array('username' => 'a', 'password' => 'b'), false, 3),
-            array(array('username' => 'user1', 'password' => 'pass'), false, 1),
-            array(array('username' => 'admin', 'password' => 'admin'), true, 0),
-        );
-    }
-
-    /**
-     * @dataProvider getDataForTestGetFormInValidator
-     *
-     * @param array $value
-     * @param bool $expectedResult
-     * @param int $countErrors
-     */
-    public function testGetFormInValidator(array $value, $expectedResult, $countErrors)
-    {
-        $constraint = ArrayConstraint::create()
-            ->addScalarConstraint('username')
-                ->addValidator(new StringLengthGreat(2))
-            ->end()
-            ->addScalarConstraint('password')
-                ->addValidator(new StringLengthGreat(2))
-                ->addCallableValidator(function($value, ScalarConstraint $constraint) {
-                    return $value == $constraint->getParent()->get('username')->getValue();
-                })
-            ->end()
+        $constraint = ScalarConstraint::create()
+            ->addTransformer(new StringTrim())
+            ->saveValue('label1')
+            ->addTransformer(new StringMaxLength(2))
+            ->saveValue('label2')
+            ->addTransformer(new StringMaxLength(1))
+            ->saveValue('label3')
         ;
 
-        $constraint->filter($value);
+        $constraint->filter(' abc ');
 
-        $this->assertEquals($expectedResult, $constraint->isValid());
-        $this->assertCount($countErrors, $constraint->getErrorMessages());
+        $this->assertEquals(' abc ', $constraint->getValue(IConstraint::VALUE_BEFORE));
+        $this->assertEquals('a', $constraint->getValue(IConstraint::VALUE_AFTER));
+        $this->assertEquals('a', $constraint->getValue());
+
+        $this->assertEquals('abc', $constraint->getValue('label1'));
+        $this->assertEquals('ab', $constraint->getValue('label2'));
+        $this->assertEquals('a', $constraint->getValue('label3'));
+    }
+
+    public function testRestoreValue()
+    {
+        $constraint = ScalarConstraint::create()
+            ->addTransformer(new StringTrim())
+            ->addValidator(new Compare('abc'))
+            ->saveValue('label1')
+
+            ->addTransformer(new StringMaxLength(1))
+            ->addValidator(new Compare('a'))
+            ->saveValue('label2')
+            ->restoreValue('label1')
+        ;
+
+        $constraint->filter(' abc ');
+
+        $this->assertTrue($constraint->isValid());
+
+        $this->assertEquals(' abc ', $constraint->getValue(IConstraint::VALUE_BEFORE));
+        $this->assertEquals('abc', $constraint->getValue(IConstraint::VALUE_AFTER));
+        $this->assertEquals('abc', $constraint->getValue());
+
+        $this->assertEquals('abc', $constraint->getValue('label1'));
+        $this->assertEquals('a', $constraint->getValue('label2'));
     }
 }
