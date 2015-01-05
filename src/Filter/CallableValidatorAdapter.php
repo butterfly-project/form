@@ -1,6 +1,6 @@
 <?php
 
-namespace Butterfly\Component\Form\Adapter;
+namespace Butterfly\Component\Form\Filter;
 
 use Butterfly\Component\Form\IConstraint;
 use Butterfly\Component\Validation\IValidator;

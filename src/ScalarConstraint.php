@@ -2,23 +2,20 @@
 
 namespace Butterfly\Component\Form;
 
-use Butterfly\Component\Form\Adapter\CallableTransformerAdapter;
-use Butterfly\Component\Form\Adapter\CallableValidatorAdapter;
-use Butterfly\Component\Form\Adapter\ValidatorChainAdapter;
+use Butterfly\Component\Form\Filter\CallableTransformerAdapter;
+use Butterfly\Component\Form\Filter\CallableValidatorAdapter;
+use Butterfly\Component\Form\Filter\RestoreValueFilter;
+use Butterfly\Component\Form\Filter\SaveValueFilter;
+use Butterfly\Component\Form\Filter\ValidatorChainAdapter;
 use Butterfly\Component\Transform\ITransformer;
 use Butterfly\Component\Validation\IValidator;
 
 class ScalarConstraint implements IConstraint
 {
     /**
-     * @var mixed
+     * @var array
      */
-    protected $oldValue;
-
-    /**
-     * @var mixed
-     */
-    protected $value;
+    protected $values = array();
 
     /**
      * @var array
@@ -117,12 +114,34 @@ class ScalarConstraint implements IConstraint
     }
 
     /**
+     * @param mixed $label
+     * @return ScalarConstraint
+     */
+    public function saveValue($label)
+    {
+        $this->filters[] = new SaveValueFilter($label);
+
+        return $this;
+    }
+
+    /**
+     * @param mixed $label
+     * @return $this
+     */
+    public function restoreValue($label)
+    {
+        $this->filters[] = new RestoreValueFilter($label);
+
+        return $this;
+    }
+
+    /**
      * @param mixed $value
      * @return ScalarConstraint
      */
     public function filter($value)
     {
-        $this->setOldValue($value);
+        $this->setValue(IConstraint::VALUE_BEFORE, $value);
 
         foreach ($this->filters as $filter) {
             if ($filter instanceof ITransformer) {
@@ -138,28 +157,25 @@ class ScalarConstraint implements IConstraint
                 if ($filter->isFatal()) {
                     break;
                 }
+            } elseif ($filter instanceof SaveValueFilter) {
+                $this->values[$filter->getLabel()] = $value;
+            } elseif ($filter instanceof RestoreValueFilter) {
+                $value = $this->getValue($filter->getLabel());
             }
         }
 
-        $this->setValue($value);
+        $this->setValue(IConstraint::VALUE_AFTER, $value);
 
         return $this;
     }
 
     /**
-     * @param mixed $oldValue
-     */
-    protected function setOldValue($oldValue)
-    {
-        $this->oldValue = $oldValue;
-    }
-
-    /**
+     * @param mixed $label
      * @param mixed $value
      */
-    protected function setValue($value)
+    protected function setValue($label, $value)
     {
-        $this->value = $value;
+        $this->values[$label] = $value;
     }
 
     /**
@@ -167,15 +183,20 @@ class ScalarConstraint implements IConstraint
      */
     public function getOldValue()
     {
-        return $this->oldValue;
+        return $this->getValue(IConstraint::VALUE_BEFORE);
     }
 
     /**
+     * @param mixed $label
      * @return mixed
      */
-    public function getValue()
+    public function getValue($label = IConstraint::VALUE_AFTER)
     {
-        return $this->value;
+        if (!array_key_exists($label, $this->values)) {
+            throw new \InvalidArgumentException(sprintf('Label %s is not found', $label));
+        }
+
+        return $this->values[$label];
     }
 
     /**

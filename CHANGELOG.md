@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+1.0.3
+-----
+
+Added functionality:
+
+ * Added methods of save and restore values to ScalarConstraint 
+
 1.0.2
 -----
 

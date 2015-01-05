@@ -4,6 +4,9 @@ namespace Butterfly\Component\Form;
 
 interface IConstraint
 {
+    const VALUE_BEFORE  = 'before';
+    const VALUE_AFTER   = 'after';
+
     /**
      * @param mixed $value
      * @return mixed
@@ -32,9 +35,10 @@ interface IConstraint
     public function setParent(ArrayConstraint $parent);
 
     /**
+     * @param mixed $label
      * @return mixed
      */
-    public function getValue();
+    public function getValue($label);
 
     /**
      * @return mixed
