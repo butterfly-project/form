@@ -58,6 +58,19 @@ class ArrayConstraint implements IConstraint, \Countable, \IteratorAggregate, \A
 
     /**
      * @param string $key
+     * @return SyntheticConstraint
+     */
+    public function addSyntheticConstraint($key)
+    {
+        $constraint = new SyntheticConstraint();
+
+        $this->addConstraint($key, $constraint);
+
+        return $constraint;
+    }
+
+    /**
+     * @param string $key
      * @return ScalarConstraint
      */
     public function addScalarConstraint($key)
@@ -148,9 +161,17 @@ class ArrayConstraint implements IConstraint, \Countable, \IteratorAggregate, \A
     public function filter($value)
     {
         foreach ($this->order as $key) {
-            $fieldValue = isset($value[$key]) ? $value[$key] : null;
+            $constraint = $this->constraints[$key];
 
-            $this->constraints[$key]->filter($fieldValue);
+            if ($constraint instanceof SyntheticConstraint) {
+                $fieldValue = $this;
+            } elseif (array_key_exists($key, $value)) {
+                $fieldValue = $value[$key];
+            } else {
+                $fieldValue = null;
+            }
+
+            $constraint->filter($fieldValue);
         }
 
         return $this;

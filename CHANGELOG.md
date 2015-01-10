@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+1.0.4
+-----
+
+Added functionality:
+
+ * Added synthetic constraint 
+
 1.0.3
 -----
 

@@ -7,6 +7,8 @@ use Butterfly\Component\Form\IConstraint;
 use Butterfly\Component\Form\ScalarConstraint;
 use Butterfly\Component\Transform\String\StringMaxLength;
 use Butterfly\Component\Transform\String\StringTrim;
+use Butterfly\Component\Transform\Type\ToString;
+use Butterfly\Component\Validation\IsNotNull;
 use Butterfly\Component\Validation\String\StringLengthGreat;
 
 class ArrayConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
@@ -71,6 +73,39 @@ class ArrayConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
                 ->end()
             ->end()
         ;
+    }
+
+    public function getDataForTestFilterIfKeyNotExists()
+    {
+        return array(
+            array(array('subject' => 'test_subject', 'body' => 'test_body'), true, 0),
+            array(array('subject' => 'test_subject'), false, 1),
+            array(array('body' => 'test_body'), false, 1),
+            array(array(), false, 2),
+        );
+    }
+
+    /**
+     * @dataProvider getDataForTestFilterIfKeyNotExists
+     *
+     * @param array $data
+     * @param bool $expectedResult
+     * @param int $expectedCountErrors
+     */
+    public function testFilterIfKeyNotExists(array $data, $expectedResult, $expectedCountErrors)
+    {
+        $constraint = ArrayConstraint::create()
+            ->addScalarConstraint('subject')
+                ->addValidator(new IsNotNull(), 'Incorrect subject')
+            ->end()
+            ->addScalarConstraint('body')
+                ->addValidator(new IsNotNull(), 'Incorrect body')
+            ->end();
+
+        $constraint->filter($data);
+
+        $this->assertEquals($expectedResult, $constraint->isValid());
+        $this->assertCount($expectedCountErrors, $constraint->getErrorMessages());
     }
 
     public function testParent()
@@ -243,5 +278,69 @@ class ArrayConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($expectedResult, $constraint->isValid());
         $this->assertCount($countErrors, $constraint->getErrorMessages());
+    }
+
+    public function testAddSyntheticConstraint()
+    {
+        $data = array(
+            'username' => 'user1',
+            'password' => 'pass1',
+        );
+
+        $userRepository = $this;
+
+        $constraint = ArrayConstraint::create()
+            ->addScalarConstraint('username')
+                ->addTransformer(new ToString())
+            ->end()
+            ->addScalarConstraint('password')
+                ->addTransformer(new ToString())
+            ->end()
+            ->addSyntheticConstraint('user')
+                ->addCallableTransformer(function(ArrayConstraint $form) use ($userRepository) {
+                    $username = $form->get('username')->getValue();
+                    $password = $form->get('password')->getValue();
+
+                    return $userRepository->findUserByUsernameAndPassword($username, $password);
+                })
+                ->addValidator(new IsNotNull(), 'Access Denied')
+            ->end()
+        ;
+
+        $constraint->filter($data);
+
+        $this->assertTrue($constraint->isValid());
+        $this->assertNull($constraint->get('user')->getOldValue());
+        $this->assertEquals($this->getUser('user1', 'pass1'), $constraint->get('user')->getValue());
+    }
+
+    /**
+     * @param string $username
+     * @param string $password
+     * @return null|\stdClass
+     */
+    public function findUserByUsernameAndPassword($username, $password)
+    {
+        if ($username != 'user1' || $password != 'pass1') {
+            return null;
+        }
+
+        $user = $this->getUser($username, $password);
+
+        return $user;
+    }
+
+    /**
+     * @param string $username
+     * @param string $password
+     * @return \stdClass
+     */
+    private function getUser($username, $password)
+    {
+        $user           = new \stdClass();
+        $user->username = $username;
+        $user->password = $password;
+
+        return $user;
     }
 }
