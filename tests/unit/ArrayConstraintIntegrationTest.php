@@ -264,13 +264,13 @@ class ArrayConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
     {
         $constraint = ArrayConstraint::create()
             ->addScalarConstraint('username')
-            ->addValidator(new StringLengthGreat(2))
+                ->addValidator(new StringLengthGreat(2))
             ->end()
             ->addScalarConstraint('password')
-            ->addValidator(new StringLengthGreat(2))
-            ->addCallableValidator(function($value, ScalarConstraint $constraint) {
-                return $value == $constraint->getParent()->get('username')->getValue();
-            })
+                ->addValidator(new StringLengthGreat(2))
+                ->addCallableValidator(function($value, ScalarConstraint $constraint) {
+                    return $value == $constraint->getParent()->get('username')->getValue();
+                })
             ->end()
         ;
 
@@ -342,5 +342,118 @@ class ArrayConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
         $user->password = $password;
 
         return $user;
+    }
+
+    public function testModidyFormAddNextKey()
+    {
+        $value = array(
+            'key1' => '',
+            'key2' => 'b',
+            'flag' => 'on'
+        );
+
+        $constraint = ArrayConstraint::create()
+            ->addScalarConstraint('flag')
+                ->addCallableTransformer(function($flag, ScalarConstraint $flagConstraint) {
+                    if ('on' === $flag) {
+                        $form = $flagConstraint->getParent();
+                        $form
+                            ->addScalarConstraint('key1')
+                                ->addValidator(new StringLengthGreat(0))
+                            ->end()
+                            ->addScalarConstraint('key2')
+                                ->addValidator(new StringLengthGreat(0))
+                            ->end();
+                    }
+                })
+            ->end()
+        ;
+
+        $constraint->filter($value);
+
+        $this->assertFalse($constraint->isValid());
+        $this->assertCount(1, $constraint->getErrorMessages());
+    }
+
+    public function testModidyFormRemoveNextKey()
+    {
+        $value = array(
+            'key2' => 'b',
+            'flag' => 'on'
+        );
+
+        $constraint = ArrayConstraint::create()
+            ->addScalarConstraint('flag')
+                ->addCallableTransformer(function($flag, ScalarConstraint $flagConstraint) {
+                    if ('on' === $flag) {
+                        $form = $flagConstraint->getParent();
+                        $form->removeConstraint('key1');
+                    }
+                })
+            ->end()
+            ->addScalarConstraint('key1')
+                ->addValidator(new StringLengthGreat(0))
+            ->end()
+            ->addScalarConstraint('key2')
+                ->addValidator(new StringLengthGreat(0))
+            ->end()
+        ;
+
+        $constraint->filter($value);
+
+        $this->assertTrue($constraint->isValid());
+        $this->assertCount(0, $constraint->getErrorMessages());
+    }
+
+    public function testModidyFormRemovePreviousKey()
+    {
+        $value = array(
+            'key1' => '',
+            'key2' => 'b',
+            'flag' => 'on'
+        );
+
+        $constraint = ArrayConstraint::create()
+            ->addScalarConstraint('key1')
+                ->addValidator(new StringLengthGreat(0))
+            ->end()
+            ->addScalarConstraint('flag')
+                ->addCallableTransformer(function($flag, ScalarConstraint $flagConstraint) {
+                    if ('on' === $flag) {
+                        $form = $flagConstraint->getParent();
+                        $form->removeConstraint('key1');
+                    }
+                })
+            ->end()
+            ->addScalarConstraint('key2')
+                ->addValidator(new StringLengthGreat(0))
+            ->end()
+        ;
+
+        $constraint->filter($value);
+
+        $this->assertTrue($constraint->isValid());
+        $this->assertCount(0, $constraint->getErrorMessages());
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testModidyFormRemoveCurrentKey()
+    {
+        $value = array(
+            'flag' => 'on'
+        );
+
+        $constraint = ArrayConstraint::create()
+            ->addScalarConstraint('flag')
+                ->addCallableTransformer(function($flag, ScalarConstraint $flagConstraint) {
+                    $form = $flagConstraint->getParent();
+                    $form->removeConstraint('flag');
+                })
+            ->end()
+        ;
+
+        $constraint->filter($value);
     }
 }

@@ -12,9 +12,9 @@ class ArrayConstraint implements IConstraint, \Countable, \IteratorAggregate, \A
     protected $constraints = array();
 
     /**
-     * @var array
+     * @var VariableIterator
      */
-    protected $order = array();
+    protected $iterator;
 
     /**
      * @var ArrayConstraint|null
@@ -27,6 +27,11 @@ class ArrayConstraint implements IConstraint, \Countable, \IteratorAggregate, \A
     public static function create()
     {
         return new static();
+    }
+
+    public function __construct()
+    {
+        $this->iterator = new VariableIterator();
     }
 
     /**
@@ -104,8 +109,8 @@ class ArrayConstraint implements IConstraint, \Countable, \IteratorAggregate, \A
     {
         $this->constraints[$key] = $constraint;
 
-        $this->removeOrderKey($key);
-        $this->addOrderKey($key);
+        $this->iterator->removeValue($key);
+        $this->iterator->addValue($key);
 
         $constraint->setParent($this);
 
@@ -120,7 +125,7 @@ class ArrayConstraint implements IConstraint, \Countable, \IteratorAggregate, \A
     {
         unset($this->constraints[$key]);
 
-        $this->removeOrderKey($key);
+        $this->iterator->removeValue($key);
 
         return $this;
     }
@@ -135,32 +140,12 @@ class ArrayConstraint implements IConstraint, \Countable, \IteratorAggregate, \A
     }
 
     /**
-     * @param string $key
-     */
-    protected function addOrderKey($key)
-    {
-        $this->order[] = $key;
-    }
-
-    /**
-     * @param string $key
-     */
-    protected function removeOrderKey($key)
-    {
-        $index = array_search($key, $this->order);
-
-        if (false !== $index) {
-            unset($this->order[$index]);
-        }
-    }
-
-    /**
      * @param mixed $value
      * @return $this
      */
     public function filter($value)
     {
-        foreach ($this->order as $key) {
+        foreach ($this->iterator as $key) {
             $constraint = $this->constraints[$key];
 
             if ($constraint instanceof SyntheticConstraint) {
