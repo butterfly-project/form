@@ -9,17 +9,16 @@ use Butterfly\Component\Form\Transform\String\StringMaxLength;
 use Butterfly\Component\Form\Transform\String\StringTrim;
 use Butterfly\Component\Form\Validation\Compare;
 use Butterfly\Component\Form\Validation\IsNull;
-use Butterfly\Component\Form\Validation\String\StringLengthGreat;
-use Butterfly\Component\Form\Validation\String\StringLengthGreatOrEqual;
-use Butterfly\Component\Form\Validation\String\StringLengthLessOrEqual;
+use Butterfly\Component\Form\Validation\StringLength;
 
 class ScalarConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
 {
     public function testTransformer()
     {
         $constraint = ScalarConstraint::create()
-            ->addTransformer(new StringTrim())
-            ->filter(' abc ');
+            ->addTransformer(new StringTrim());
+
+        $constraint->filter(' abc ');
 
         $this->assertEquals(' abc ', $constraint->getOldValue());
         $this->assertEquals(' abc ', $constraint->getValue(IConstraint::VALUE_BEFORE));
@@ -34,8 +33,10 @@ class ScalarConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
     public function testGetValueIfIncorrectLabel()
     {
         $constraint = ScalarConstraint::create()
-            ->addTransformer(new StringTrim())
-            ->filter(' abc ');
+            ->addTransformer(new StringTrim());
+
+
+        $constraint->filter(' abc ');
 
         $constraint->getValue('undefined');
     }
@@ -45,8 +46,9 @@ class ScalarConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
         $constraint = ScalarConstraint::create()
             ->addCallableTransformer(function($value) {
                 return strlen($value);
-            })
-            ->filter('abc');
+            });
+
+        $constraint->filter('abc');
 
         $this->assertEquals(3, $constraint->getValue());
     }
@@ -54,8 +56,9 @@ class ScalarConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
     public function testValidator()
     {
         $constraint = ScalarConstraint::create()
-            ->addValidator(new IsNull(), 'incorrect value')
-            ->filter(null);
+            ->addValidator(new IsNull(), 'incorrect value');
+
+        $constraint->filter(null);
 
         $this->assertTrue($constraint->isValid());
         $this->assertNull($constraint->getFirstErrorMessage());
@@ -64,8 +67,9 @@ class ScalarConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
     public function testValidatorIfNegative()
     {
         $constraint = ScalarConstraint::create()
-            ->addValidator(new IsNull(), 'incorrect value', true)
-            ->filter(null);
+            ->addValidator(new IsNull(), 'incorrect value', true);
+
+        $constraint->filter(null);
 
         $this->assertFalse($constraint->isValid());
         $this->assertEquals('incorrect value', $constraint->getFirstErrorMessage());
@@ -74,9 +78,10 @@ class ScalarConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
     public function testMoreValidators()
     {
         $constraint = ScalarConstraint::create()
-            ->addValidator(new StringLengthGreat(3), 'incorrect value')
-            ->addValidator(new StringLengthGreat(5), 'incorrect value')
-            ->filter('ab');
+            ->addValidator(new StringLength(3, StringLength::GREATER), 'incorrect value')
+            ->addValidator(new StringLength(5, StringLength::GREATER), 'incorrect value');
+
+        $constraint->filter('ab');
 
         $this->assertFalse($constraint->isValid());
         $this->assertCount(2, $constraint->getErrorMessages());
@@ -85,9 +90,10 @@ class ScalarConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
     public function testFatalValidators()
     {
         $constraint = ScalarConstraint::create()
-            ->addValidator(new StringLengthGreat(3), 'incorrect value', false, true)
-            ->addValidator(new StringLengthGreat(5), 'incorrect value')
-            ->filter('ab');
+            ->addValidator(new StringLength(3, StringLength::GREATER), 'incorrect value', false, true)
+            ->addValidator(new StringLength(5, StringLength::GREATER), 'incorrect value');
+
+        $constraint->filter('ab');
 
         $this->assertFalse($constraint->isValid());
         $this->assertCount(1, $constraint->getErrorMessages());
@@ -98,8 +104,9 @@ class ScalarConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
         $constraint = ScalarConstraint::create()
             ->addCallableValidator(function($value) {
                 return 'abc' == $value;
-            }, 'incorrect value')
-            ->filter('abc');
+            }, 'incorrect value');
+
+        $constraint->filter('abc');
 
         $this->assertTrue($constraint->isValid());
         $this->assertNull($constraint->getFirstErrorMessage());
@@ -127,11 +134,11 @@ class ScalarConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
     {
         $constraint = ScalarConstraint::create()
             ->addTransformer(new StringTrim())
-            ->addValidator(new StringLengthLessOrEqual(3))
-            ->addValidator(new StringLengthGreatOrEqual(3))
+            ->addValidator(new StringLength(3, StringLength::LESS_OR_EQUAL))
+            ->addValidator(new StringLength(3, StringLength::GREATER_OR_EQUAL))
             ->addTransformer(new StringMaxLength(2))
-            ->addValidator(new StringLengthLessOrEqual(2))
-            ->addValidator(new StringLengthGreatOrEqual(2))
+            ->addValidator(new StringLength(2, StringLength::LESS_OR_EQUAL))
+            ->addValidator(new StringLength(2, StringLength::GREATER_OR_EQUAL))
         ;
 
         $constraint->filter(' abc ');

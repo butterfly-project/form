@@ -8,8 +8,9 @@ use Butterfly\Component\Form\ScalarConstraint;
 use Butterfly\Component\Form\Transform\String\StringMaxLength;
 use Butterfly\Component\Form\Transform\String\StringTrim;
 use Butterfly\Component\Form\Transform\Type\ToString;
+use Butterfly\Component\Form\Validation\IsNotEmpty;
 use Butterfly\Component\Form\Validation\IsNotNull;
-use Butterfly\Component\Form\Validation\String\StringLengthGreat;
+use Butterfly\Component\Form\Validation\StringLength;
 
 class ArrayConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
 {
@@ -55,12 +56,12 @@ class ArrayConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
             ->addScalarConstraint('caption')
                 ->addTransformer(new StringTrim())
                 ->addTransformer(new StringMaxLength(4))
-                ->addValidator(new StringLengthGreat(0), 'incorrect caption')
+                ->addValidator(new IsNotEmpty(), 'incorrect caption')
             ->end()
             ->addScalarConstraint('body')
                 ->addTransformer(new StringTrim())
                 ->addTransformer(new StringMaxLength(10))
-                ->addValidator(new StringLengthGreat(0), 'incorrect body')
+                ->addValidator(new IsNotEmpty(), 'incorrect body')
             ->end()
             ->addArrayConstraint('message')
                 ->addScalarConstraint('from')
@@ -132,12 +133,12 @@ class ArrayConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
             ->addScalarConstraint('caption')
                 ->addTransformer(new StringTrim())
                 ->addTransformer(new StringMaxLength(4))
-                ->addValidator(new StringLengthGreat(0), 'incorrect caption')
+                ->addValidator(new IsNotEmpty(), 'incorrect caption')
             ->end()
             ->addScalarConstraint('body')
                 ->addTransformer(new StringTrim())
                 ->addTransformer(new StringMaxLength(10))
-                ->addValidator(new StringLengthGreat(0), 'incorrect body')
+                ->addValidator(new IsNotEmpty(), 'incorrect body')
             ->end()
             ;
 
@@ -154,8 +155,8 @@ class ArrayConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
         $constraint = ArrayConstraint::create()
             ->addScalarConstraint('caption')
                 ->addTransformer(new StringTrim())
-                ->addValidator(new StringLengthGreat(10), 'incorrect caption 1')
-                ->addValidator(new StringLengthGreat(10), 'incorrect caption 2')
+                ->addValidator(new StringLength(10, StringLength::GREATER), 'incorrect caption 1')
+                ->addValidator(new StringLength(10, StringLength::GREATER), 'incorrect caption 2')
             ->end();
 
         $constraint->filter(array('caption' => ' abc  '));
@@ -168,8 +169,8 @@ class ArrayConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
         $constraint = ArrayConstraint::create()
             ->addScalarConstraint('caption')
                 ->addTransformer(new StringTrim())
-                ->addValidator(new StringLengthGreat(0), 'incorrect caption 1')
-                ->addValidator(new StringLengthGreat(0), 'incorrect caption 2')
+                ->addValidator(new IsNotEmpty(), 'incorrect caption 1')
+                ->addValidator(new IsNotEmpty(), 'incorrect caption 2')
             ->end();
 
         $constraint->filter(array('caption' => ' abc  '));
@@ -264,10 +265,10 @@ class ArrayConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
     {
         $constraint = ArrayConstraint::create()
             ->addScalarConstraint('username')
-                ->addValidator(new StringLengthGreat(2))
+                ->addValidator(new StringLength(2, StringLength::GREATER))
             ->end()
             ->addScalarConstraint('password')
-                ->addValidator(new StringLengthGreat(2))
+                ->addValidator(new StringLength(2, StringLength::GREATER))
                 ->addCallableValidator(function($value, ScalarConstraint $constraint) {
                     return $value == $constraint->getParent()->get('username')->getValue();
                 })
@@ -359,10 +360,10 @@ class ArrayConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
                         $form = $flagConstraint->getParent();
                         $form
                             ->addScalarConstraint('key1')
-                                ->addValidator(new StringLengthGreat(0))
+                                ->addValidator(new IsNotEmpty())
                             ->end()
                             ->addScalarConstraint('key2')
-                                ->addValidator(new StringLengthGreat(0))
+                                ->addValidator(new IsNotEmpty())
                             ->end();
                     }
                 })
@@ -392,10 +393,10 @@ class ArrayConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
                 })
             ->end()
             ->addScalarConstraint('key1')
-                ->addValidator(new StringLengthGreat(0))
+                ->addValidator(new IsNotEmpty())
             ->end()
             ->addScalarConstraint('key2')
-                ->addValidator(new StringLengthGreat(0))
+                ->addValidator(new IsNotEmpty())
             ->end()
         ;
 
@@ -415,7 +416,7 @@ class ArrayConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
 
         $constraint = ArrayConstraint::create()
             ->addScalarConstraint('key1')
-                ->addValidator(new StringLengthGreat(0))
+                ->addValidator(new IsNotEmpty())
             ->end()
             ->addScalarConstraint('flag')
                 ->addCallableTransformer(function($flag, ScalarConstraint $flagConstraint) {
@@ -426,7 +427,7 @@ class ArrayConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
                 })
             ->end()
             ->addScalarConstraint('key2')
-                ->addValidator(new StringLengthGreat(0))
+                ->addValidator(new IsNotEmpty())
             ->end()
         ;
 
