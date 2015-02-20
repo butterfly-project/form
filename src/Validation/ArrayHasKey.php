@@ -8,12 +8,12 @@ namespace Butterfly\Component\Form\Validation;
 class ArrayHasKey implements IValidator
 {
     /**
-     * @var string
+     * @var mixed
      */
     protected $key;
 
     /**
-     * @param string $key
+     * @param mixed $key
      */
     public function __construct($key)
     {
