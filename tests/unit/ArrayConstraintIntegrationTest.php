@@ -5,11 +5,11 @@ namespace Butterfly\Component\Form\Tests;
 use Butterfly\Component\Form\ArrayConstraint;
 use Butterfly\Component\Form\IConstraint;
 use Butterfly\Component\Form\ScalarConstraint;
-use Butterfly\Component\Transform\String\StringMaxLength;
-use Butterfly\Component\Transform\String\StringTrim;
-use Butterfly\Component\Transform\Type\ToString;
-use Butterfly\Component\Validation\IsNotNull;
-use Butterfly\Component\Validation\String\StringLengthGreat;
+use Butterfly\Component\Form\Transform\String\StringMaxLength;
+use Butterfly\Component\Form\Transform\String\StringTrim;
+use Butterfly\Component\Form\Transform\Type\ToString;
+use Butterfly\Component\Form\Validation\IsNotNull;
+use Butterfly\Component\Form\Validation\String\StringLengthGreat;
 
 class ArrayConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
 {

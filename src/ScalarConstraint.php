@@ -7,8 +7,8 @@ use Butterfly\Component\Form\Filter\CallableValidatorAdapter;
 use Butterfly\Component\Form\Filter\RestoreValueFilter;
 use Butterfly\Component\Form\Filter\SaveValueFilter;
 use Butterfly\Component\Form\Filter\ValidatorChainAdapter;
-use Butterfly\Component\Transform\ITransformer;
-use Butterfly\Component\Validation\IValidator;
+use Butterfly\Component\Form\Transform\ITransformer;
+use Butterfly\Component\Form\Validation\IValidator;
 
 class ScalarConstraint implements IConstraint
 {

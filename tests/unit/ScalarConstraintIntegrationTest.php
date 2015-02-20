@@ -5,13 +5,13 @@ namespace Butterfly\Component\Form\Tests;
 use Butterfly\Component\Form\ArrayConstraint;
 use Butterfly\Component\Form\IConstraint;
 use Butterfly\Component\Form\ScalarConstraint;
-use Butterfly\Component\Transform\String\StringMaxLength;
-use Butterfly\Component\Transform\String\StringTrim;
-use Butterfly\Component\Validation\Compare;
-use Butterfly\Component\Validation\IsNull;
-use Butterfly\Component\Validation\String\StringLengthGreat;
-use Butterfly\Component\Validation\String\StringLengthGreatOrEqual;
-use Butterfly\Component\Validation\String\StringLengthLessOrEqual;
+use Butterfly\Component\Form\Transform\String\StringMaxLength;
+use Butterfly\Component\Form\Transform\String\StringTrim;
+use Butterfly\Component\Form\Validation\Compare;
+use Butterfly\Component\Form\Validation\IsNull;
+use Butterfly\Component\Form\Validation\String\StringLengthGreat;
+use Butterfly\Component\Form\Validation\String\StringLengthGreatOrEqual;
+use Butterfly\Component\Form\Validation\String\StringLengthLessOrEqual;
 
 class ScalarConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
 {
