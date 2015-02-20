@@ -14,6 +14,7 @@ class ArrayCountTest extends \PHPUnit_Framework_TestCase
         return array(
             array(array(), 0, true, 'check empty array'),
             array(array(1, 2), 2, true, 'check not empty array'),
+            array(array(1), 2, false, 'check not empty array'),
         );
     }
 
