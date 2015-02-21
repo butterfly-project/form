@@ -12,9 +12,8 @@ class IsNullTest extends \PHPUnit_Framework_TestCase
     public function getDataForTestCheck()
     {
         return array(
-            array('asdf', false),
-            array(123, false),
-            array(null, true),
+            array(null, true, 'check is null - success'),
+            array('asdf', false, 'check is null - fail'),
         );
     }
 
@@ -23,11 +22,12 @@ class IsNullTest extends \PHPUnit_Framework_TestCase
      *
      * @param mixed $value
      * @param bool $expectedResult
+     * @param string $caseMessage
      */
-    public function testCheck($value, $expectedResult)
+    public function testCheck($value, $expectedResult, $caseMessage)
     {
         $validator = new IsNull();
 
-        $this->assertEquals($expectedResult, $validator->check($value));
+        $this->assertEquals($expectedResult, $validator->check($value), $caseMessage);
     }
 }

@@ -12,24 +12,24 @@ class InArrayTest extends \PHPUnit_Framework_TestCase
     public function getDataForTestCheck()
     {
         return array(
-            array(1, array(1), true, 'check exists value'),
-            array(1, array(), false, 'check not existing value'),
-            array(null, array(null), true, 'check existing "null" value'),
-            array('abc', array('a' => 'abc'), true, 'check existing value in associated array'),
+            array(array(1), 1, true, 'check exists value - success'),
+            array(array(null), null, true, 'check existing "null" value - success'),
+            array(array('a' => 'abc'), 'abc', true, 'check existing value in associated array - success'),
+            array(array(), 1, false, 'check not existing value - fail'),
         );
     }
 
     /**
      * @dataProvider getDataForTestCheck
      *
+     * @param string $list
      * @param mixed $value
-     * @param string $key
      * @param bool $expectedResult
      * @param string $caseMessage
      */
-    public function testCheck($value, $key, $expectedResult, $caseMessage)
+    public function testCheck($list, $value, $expectedResult, $caseMessage)
     {
-        $validator = new InArray($key);
+        $validator = new InArray($list);
 
         $this->assertEquals($expectedResult, $validator->check($value), $caseMessage);
     }

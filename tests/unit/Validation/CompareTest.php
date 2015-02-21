@@ -12,64 +12,56 @@ class CompareTest extends \PHPUnit_Framework_TestCase
     public function getDataForTestCheck()
     {
         return array(
-            // equal
-            array(1, 1, Compare::EQUAL, true),
-            array(0, 1, Compare::EQUAL, false),
-            array(true, 'asdf', Compare::EQUAL, true),
+            array(Compare::EQUAL, 1, 1, true, 'check equal - success'),
+            array(Compare::EQUAL, true, 'asdf', true, 'check equal with juggling - success'),
+            array(Compare::EQUAL, 0, 1, false, 'check equal - fail'),
 
-            // identical
-            array(1, 1, Compare::IDENTICALLY, true),
-            array(0, 1, Compare::IDENTICALLY, false),
-            array(true, 'asdf', Compare::IDENTICALLY, false),
+            array(Compare::IDENTICALLY, 1, 1, true, 'check identically - success'),
+            array(Compare::IDENTICALLY, 0, 1, false, 'check identically - fail'),
+            array(Compare::IDENTICALLY, true, 'asdf', false, 'check identically with juggling - fail'),
 
-            // not equal
-            array(1, 1, Compare::NOT_EQUAL, false),
-            array(0, 1, Compare::NOT_EQUAL, true),
-            array(true, 'asdf', Compare::NOT_EQUAL, false),
+            array(Compare::NOT_EQUAL, 0, 1, true, 'check not equal - success'),
+            array(Compare::NOT_EQUAL, 1, 1, false, 'check not equal - fail'),
+            array(Compare::NOT_EQUAL, true, 'asdf', false, 'check not equal with juggling - fail'),
 
-            // not equal alternative
-            array(1, 1, Compare::NOT_EQUAL_ALTERNATIVE, false),
-            array(0, 1, Compare::NOT_EQUAL_ALTERNATIVE, true),
-            array(true, 'asdf', Compare::NOT_EQUAL_ALTERNATIVE, false),
+            array(Compare::NOT_EQUAL_ALTERNATIVE, 0, 1, true, 'check not equal alternative - success'),
+            array(Compare::NOT_EQUAL_ALTERNATIVE, 1, 1, false, 'check not equal alternative - fail'),
+            array(Compare::NOT_EQUAL_ALTERNATIVE, true, 'asdf', false, 'check not equal alternative with juggling - fail'),
 
-            // not identical
-            array(1, 1, Compare::NOT_IDENTICALLY, false),
-            array(0, 1, Compare::NOT_IDENTICALLY, true),
-            array(true, 'asdf', Compare::NOT_IDENTICALLY, true),
+            array(Compare::NOT_IDENTICALLY, 0, 1, true, 'check not identically - success'),
+            array(Compare::NOT_IDENTICALLY, true, 'asdf', true, 'check not identically with juggling - success'),
+            array(Compare::NOT_IDENTICALLY, 1, 1, false, 'check not identically - fail'),
 
-            // less
-            array(1, 0, Compare::LESS, true),
-            array(1, 5, Compare::LESS, false),
+            array(Compare::LESS, 1, 0, true, 'check less - success'),
+            array(Compare::LESS, 1, 5, false, 'check less - fail'),
 
-            // greater
-            array(1, 5, Compare::GREATER, true),
-            array(1, 0, Compare::GREATER, false),
+            array(Compare::GREATER, 1, 5, true, 'check greater - success'),
+            array(Compare::GREATER, 1, 0, false, 'check greater - fail'),
 
-            // less or equal
-            array(1, 0, Compare::LESS_OR_EQUAL, true),
-            array(1, 1, Compare::LESS_OR_EQUAL, true),
-            array(1, 5, Compare::LESS_OR_EQUAL, false),
+            array(Compare::LESS_OR_EQUAL, 1, 0, true, 'check less or equal - success'),
+            array(Compare::LESS_OR_EQUAL, 1, 1, true, 'check less or equal - success'),
+            array(Compare::LESS_OR_EQUAL, 1, 5, false, 'check less or equal - fail'),
 
-            // less or equal
-            array(1, 5, Compare::GREATER_OR_EQUAL, true),
-            array(1, 1, Compare::GREATER_OR_EQUAL, true),
-            array(1, 0, Compare::GREATER_OR_EQUAL, false),
+            array(Compare::GREATER_OR_EQUAL, 1, 5, true, 'check greater or equal - success'),
+            array(Compare::GREATER_OR_EQUAL, 1, 1, true, 'check greater or equal - success'),
+            array(Compare::GREATER_OR_EQUAL, 1, 0, false, 'check greater or equal - fail'),
         );
     }
 
     /**
      * @dataProvider getDataForTestCheck
      *
+     * @param mixed $operator
      * @param mixed $parameter
      * @param mixed $value
-     * @param mixed $operator
      * @param bool $expectedResult
+     * @param string $caseMessage
      */
-    public function testCheck($parameter, $value, $operator, $expectedResult)
+    public function testCheck($operator, $parameter, $value, $expectedResult, $caseMessage)
     {
         $validator = new Compare($parameter, $operator);
 
-        $this->assertEquals($expectedResult, $validator->check($value));
+        $this->assertEquals($expectedResult, $validator->check($value), $caseMessage);
     }
 
     /**

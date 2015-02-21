@@ -12,9 +12,9 @@ class ArrayCountTest extends \PHPUnit_Framework_TestCase
     public function getDataForTestCheck()
     {
         return array(
-            array(array(), 0, true, 'check empty array'),
-            array(array(1, 2), 2, true, 'check not empty array'),
-            array(array(1), 2, false, 'check not empty array'),
+            array(array(), 0, true, 'check empty array - success'),
+            array(array(1, 2), 2, true, 'check not empty array - success'),
+            array(array(1), 2, false, 'check not empty array - fail'),
         );
     }
 

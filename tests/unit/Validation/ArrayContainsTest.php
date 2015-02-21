@@ -12,10 +12,11 @@ class ArrayContainsTest extends \PHPUnit_Framework_TestCase
     public function getDataForTestCheck()
     {
         return array(
-            array(array(1), 1, true, 'check exists value'),
-            array(array(), 1, false, 'check not existing value'),
-            array(array(null), null, true, 'check existing "null" value'),
-            array(array('a' => 'abc'), 'abc', true, 'check existing value in associated array'),
+            array(array(1), 1, true, 'check exists value - success'),
+            array(array(null), null, true, 'check existing "null" value - success'),
+            array(array('a' => 'abc'), 'abc', true, 'check existing value in associated array - success'),
+
+            array(array(), 1, false, 'check not existing value - fail'),
         );
     }
 

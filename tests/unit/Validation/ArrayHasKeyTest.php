@@ -12,9 +12,9 @@ class ArrayHasKeyTest extends \PHPUnit_Framework_TestCase
     public function getDataForTestCheck()
     {
         return array(
-            array(array('foo' => 1), 'foo', true, 'check exists key'),
-            array(array('foo' => 1), 'bar', false, 'check not existing key'),
-            array(array('foo' => null), 'foo', true, 'check existing key with "null" value'),
+            array(array('foo' => 1), 'foo', true, 'check exists key - success'),
+            array(array('foo' => null), 'foo', true, 'check existing key with "null" value - success'),
+            array(array('foo' => 1), 'bar', false, 'check not existing key - fail'),
         );
     }
 

@@ -12,8 +12,8 @@ class RegExpTest extends \PHPUnit_Framework_TestCase
     public function getDataForTestCheck()
     {
         return array(
-            array('/^[0-9]+$/', 123, true, 'check pattern'),
-            array('/^[0-9]+$/', 'abc', false, 'check pattern'),
+            array('/^[0-9]+$/', 123, true, 'check pattern - success'),
+            array('/^[0-9]+$/', 'abc', false, 'check pattern - fail'),
         );
     }
 

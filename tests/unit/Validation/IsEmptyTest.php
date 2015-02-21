@@ -12,22 +12,22 @@ class IsEmptyTest extends \PHPUnit_Framework_TestCase
     public function getDataForTestCheck()
     {
         return array(
-            array(null, true, 'check "null" value'),
+            array(null, true, 'check "null" value - success'),
 
-            array(false, true, 'check "false" value'),
-            array(true, false, 'check "true" value'),
+            array(false, true, 'check "false" value - success'),
+            array(true, false, 'check "true" value - fail'),
 
-            array(0, true, 'check empty integer value'),
-            array(1, false, 'check not empty integer value'),
+            array(0, true, 'check empty integer value - success'),
+            array(1, false, 'check not empty integer value - fail'),
 
-            array(0.00, true, 'check empty float value'),
-            array(0.01, false, 'check not empty float value'),
+            array(0.00, true, 'check empty float value - success'),
+            array(0.01, false, 'check not empty float value - fail'),
 
-            array('', true, 'check empty string value'),
-            array('a', false, 'check not empty string value'),
+            array('', true, 'check empty string value - success'),
+            array('a', false, 'check not empty string value - fail'),
 
-            array(array(), true, 'check empty string'),
-            array(array(1), false, 'check not empty string'),
+            array(array(), true, 'check empty string - success'),
+            array(array(1), false, 'check not empty string - fail'),
         );
     }
 

@@ -12,8 +12,8 @@ class IsTrueTest extends \PHPUnit_Framework_TestCase
     public function getDataForTestCheck()
     {
         return array(
-            array(true, true),
-            array(false, false),
+            array(true, true, 'check is "true" - success'),
+            array(false, false, 'check is "true" - fail'),
         );
     }
 
@@ -22,12 +22,13 @@ class IsTrueTest extends \PHPUnit_Framework_TestCase
      *
      * @param mixed $value
      * @param bool $expectedResult
+     * @param string $caseMessage
      */
-    public function testCheck($value, $expectedResult)
+    public function testCheck($value, $expectedResult, $caseMessage)
     {
         $validator = new IsTrue();
 
-        $this->assertEquals($expectedResult, $validator->check($value));
+        $this->assertEquals($expectedResult, $validator->check($value), $caseMessage);
     }
 
     /**
