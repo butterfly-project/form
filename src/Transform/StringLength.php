@@ -1,15 +1,16 @@
 <?php
 
-namespace Butterfly\Component\Form\Transform\String;
+namespace Butterfly\Component\Form\Transform;
 
-use Butterfly\Component\Form\Transform\ITransformer;
-
-class StringMaxLength implements ITransformer
+/**
+ * @author Marat Fakhertdinov <marat.fakhertdinov@gmail.com>
+ */
+class StringLength implements ITransformer
 {
     /**
      * @var int
      */
-    protected $length;
+    protected $maxLength;
 
     /**
      * @var string|null
@@ -17,13 +18,13 @@ class StringMaxLength implements ITransformer
     protected $encoding;
 
     /**
-     * @param int $length
+     * @param int $maxLength
      * @param string|null $encoding
      */
-    public function __construct($length, $encoding = null)
+    public function __construct($maxLength, $encoding = null)
     {
-        $this->length   = $length;
-        $this->encoding = null === $encoding ? mb_internal_encoding() : $encoding;
+        $this->maxLength = $maxLength;
+        $this->encoding  = null === $encoding ? mb_internal_encoding() : $encoding;
     }
 
     /**
@@ -37,6 +38,6 @@ class StringMaxLength implements ITransformer
             throw new \InvalidArgumentException(sprintf('Value type is not string'));
         }
 
-        return mb_substr($value, 0, $this->length, $this->encoding);
+        return mb_substr($value, 0, $this->maxLength, $this->encoding);
     }
 }

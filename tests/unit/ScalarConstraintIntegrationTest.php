@@ -5,18 +5,18 @@ namespace Butterfly\Component\Form\Tests;
 use Butterfly\Component\Form\ArrayConstraint;
 use Butterfly\Component\Form\IConstraint;
 use Butterfly\Component\Form\ScalarConstraint;
-use Butterfly\Component\Form\Transform\String\StringMaxLength;
-use Butterfly\Component\Form\Transform\String\StringTrim;
+use Butterfly\Component\Form\Transform\StringLength as StringLengthTransformer;
+use Butterfly\Component\Form\Transform\Trim;
 use Butterfly\Component\Form\Validation\Compare;
 use Butterfly\Component\Form\Validation\IsNull;
-use Butterfly\Component\Form\Validation\StringLength;
+use Butterfly\Component\Form\Validation\StringLength as StringLengthValidator;
 
 class ScalarConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
 {
     public function testTransformer()
     {
         $constraint = ScalarConstraint::create()
-            ->addTransformer(new StringTrim());
+            ->addTransformer(new Trim());
 
         $constraint->filter(' abc ');
 
@@ -33,7 +33,7 @@ class ScalarConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
     public function testGetValueIfIncorrectLabel()
     {
         $constraint = ScalarConstraint::create()
-            ->addTransformer(new StringTrim());
+            ->addTransformer(new Trim());
 
 
         $constraint->filter(' abc ');
@@ -78,8 +78,8 @@ class ScalarConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
     public function testMoreValidators()
     {
         $constraint = ScalarConstraint::create()
-            ->addValidator(new StringLength(3, StringLength::GREATER), 'incorrect value')
-            ->addValidator(new StringLength(5, StringLength::GREATER), 'incorrect value');
+            ->addValidator(new StringLengthValidator(3, StringLengthValidator::GREATER), 'incorrect value')
+            ->addValidator(new StringLengthValidator(5, StringLengthValidator::GREATER), 'incorrect value');
 
         $constraint->filter('ab');
 
@@ -90,8 +90,8 @@ class ScalarConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
     public function testFatalValidators()
     {
         $constraint = ScalarConstraint::create()
-            ->addValidator(new StringLength(3, StringLength::GREATER), 'incorrect value', false, true)
-            ->addValidator(new StringLength(5, StringLength::GREATER), 'incorrect value');
+            ->addValidator(new StringLengthValidator(3, StringLengthValidator::GREATER), 'incorrect value', false, true)
+            ->addValidator(new StringLengthValidator(5, StringLengthValidator::GREATER), 'incorrect value');
 
         $constraint->filter('ab');
 
@@ -133,12 +133,12 @@ class ScalarConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
     public function testOrder()
     {
         $constraint = ScalarConstraint::create()
-            ->addTransformer(new StringTrim())
-            ->addValidator(new StringLength(3, StringLength::LESS_OR_EQUAL))
-            ->addValidator(new StringLength(3, StringLength::GREATER_OR_EQUAL))
-            ->addTransformer(new StringMaxLength(2))
-            ->addValidator(new StringLength(2, StringLength::LESS_OR_EQUAL))
-            ->addValidator(new StringLength(2, StringLength::GREATER_OR_EQUAL))
+            ->addTransformer(new Trim())
+            ->addValidator(new StringLengthValidator(3, StringLengthValidator::LESS_OR_EQUAL))
+            ->addValidator(new StringLengthValidator(3, StringLengthValidator::GREATER_OR_EQUAL))
+            ->addTransformer(new StringLengthTransformer(2))
+            ->addValidator(new StringLengthValidator(2, StringLengthValidator::LESS_OR_EQUAL))
+            ->addValidator(new StringLengthValidator(2, StringLengthValidator::GREATER_OR_EQUAL))
         ;
 
         $constraint->filter(' abc ');
@@ -149,11 +149,11 @@ class ScalarConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
     public function testSaveValue()
     {
         $constraint = ScalarConstraint::create()
-            ->addTransformer(new StringTrim())
+            ->addTransformer(new Trim())
             ->saveValue('label1')
-            ->addTransformer(new StringMaxLength(2))
+            ->addTransformer(new StringLengthTransformer(2))
             ->saveValue('label2')
-            ->addTransformer(new StringMaxLength(1))
+            ->addTransformer(new StringLengthTransformer(1))
             ->saveValue('label3')
         ;
 
@@ -171,11 +171,11 @@ class ScalarConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
     public function testRestoreValue()
     {
         $constraint = ScalarConstraint::create()
-            ->addTransformer(new StringTrim())
+            ->addTransformer(new Trim())
             ->addValidator(new Compare('abc'))
             ->saveValue('label1')
 
-            ->addTransformer(new StringMaxLength(1))
+            ->addTransformer(new StringLengthTransformer(1))
             ->addValidator(new Compare('a'))
             ->saveValue('label2')
             ->restoreValue('label1')

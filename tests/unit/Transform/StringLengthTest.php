@@ -1,24 +1,24 @@
 <?php
 
-namespace Butterfly\Component\Form\Tests\Transform\String;
+namespace Butterfly\Component\Form\Tests\Transform;
 
-use Butterfly\Component\Form\Transform\String\StringMaxLength;
+use Butterfly\Component\Form\Transform\StringLength;
 
 /**
  * @author Marat Fakhertdinov <marat.fakhertdinov@gmail.com>
  */
-class StringMaxLengthTest extends \PHPUnit_Framework_TestCase
+class StringLengthTest extends \PHPUnit_Framework_TestCase
 {
     public function testTransform()
     {
-        $transformer = new StringMaxLength(3);
+        $transformer = new StringLength(3);
 
         $this->assertEquals('abc', $transformer->transform('abcdef'));
     }
 
     public function testTransformIfSmallSymbols()
     {
-        $transformer = new StringMaxLength(50);
+        $transformer = new StringLength(50);
 
         $this->assertEquals('abcdef', $transformer->transform('abcdef'));
     }
@@ -28,7 +28,7 @@ class StringMaxLengthTest extends \PHPUnit_Framework_TestCase
      */
     public function testTransformIfIncorrectArgument()
     {
-        $transformer = new StringMaxLength(5);
+        $transformer = new StringLength(5);
 
         $transformer->transform(123);
     }

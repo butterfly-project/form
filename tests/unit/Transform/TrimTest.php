@@ -1,31 +1,31 @@
 <?php
 
-namespace Butterfly\Component\Form\Tests\Transform\String;
+namespace Butterfly\Component\Form\Tests\Transform;
 
-use Butterfly\Component\Form\Transform\String\StringTrim;
+use Butterfly\Component\Form\Transform\Trim;
 
 /**
  * @author Marat Fakhertdinov <marat.fakhertdinov@gmail.com>
  */
-class StringTrimTest extends \PHPUnit_Framework_TestCase
+class TrimTest extends \PHPUnit_Framework_TestCase
 {
     public function testTransformIfAllTarget()
     {
-        $transformer = new StringTrim(StringTrim::TRIM_ALL);
+        $transformer = new Trim(Trim::TRIM_ALL);
 
         $this->assertEquals('abc', $transformer->transform(' abc '));
     }
 
     public function testTransformIfLeftTarget()
     {
-        $transformer = new StringTrim(StringTrim::TRIM_LEFT);
+        $transformer = new Trim(Trim::TRIM_LEFT);
 
         $this->assertEquals('abc ', $transformer->transform(' abc '));
     }
 
     public function testTransformIfRightTarget()
     {
-        $transformer = new StringTrim(StringTrim::TRIM_RIGTH);
+        $transformer = new Trim(Trim::TRIM_RIGTH);
 
         $this->assertEquals(' abc', $transformer->transform(' abc '));
     }
@@ -35,7 +35,7 @@ class StringTrimTest extends \PHPUnit_Framework_TestCase
      */
     public function testTransformIfIncorrectArgument()
     {
-        $transformer = new StringTrim();
+        $transformer = new Trim();
 
         $transformer->transform(123);
     }

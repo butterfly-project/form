@@ -5,12 +5,12 @@ namespace Butterfly\Component\Form\Tests;
 use Butterfly\Component\Form\ArrayConstraint;
 use Butterfly\Component\Form\IConstraint;
 use Butterfly\Component\Form\ScalarConstraint;
-use Butterfly\Component\Form\Transform\String\StringMaxLength;
-use Butterfly\Component\Form\Transform\String\StringTrim;
+use Butterfly\Component\Form\Transform\StringLength as StringLengthTransformer;
+use Butterfly\Component\Form\Transform\Trim;
 use Butterfly\Component\Form\Transform\ToType;
 use Butterfly\Component\Form\Validation\IsNotEmpty;
 use Butterfly\Component\Form\Validation\IsNotNull;
-use Butterfly\Component\Form\Validation\StringLength;
+use Butterfly\Component\Form\Validation\StringLength as StringLengthValidator;
 
 class ArrayConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
 {
@@ -54,23 +54,23 @@ class ArrayConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
     {
         return ArrayConstraint::create()
             ->addScalarConstraint('caption')
-                ->addTransformer(new StringTrim())
-                ->addTransformer(new StringMaxLength(4))
+                ->addTransformer(new Trim())
+                ->addTransformer(new StringLengthTransformer(4))
                 ->addValidator(new IsNotEmpty(), 'incorrect caption')
             ->end()
             ->addScalarConstraint('body')
-                ->addTransformer(new StringTrim())
-                ->addTransformer(new StringMaxLength(10))
+                ->addTransformer(new Trim())
+                ->addTransformer(new StringLengthTransformer(10))
                 ->addValidator(new IsNotEmpty(), 'incorrect body')
             ->end()
             ->addArrayConstraint('message')
                 ->addScalarConstraint('from')
-                    ->addTransformer(new StringTrim())
-                    ->addTransformer(new StringMaxLength(2))
+                    ->addTransformer(new Trim())
+                    ->addTransformer(new StringLengthTransformer(2))
                 ->end()
                 ->addScalarConstraint('text')
-                    ->addTransformer(new StringTrim())
-                    ->addTransformer(new StringMaxLength(2))
+                    ->addTransformer(new Trim())
+                    ->addTransformer(new StringLengthTransformer(2))
                 ->end()
             ->end()
         ;
@@ -131,13 +131,13 @@ class ArrayConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
     {
         $constraint = ArrayConstraint::create()
             ->addScalarConstraint('caption')
-                ->addTransformer(new StringTrim())
-                ->addTransformer(new StringMaxLength(4))
+                ->addTransformer(new Trim())
+                ->addTransformer(new StringLengthTransformer(4))
                 ->addValidator(new IsNotEmpty(), 'incorrect caption')
             ->end()
             ->addScalarConstraint('body')
-                ->addTransformer(new StringTrim())
-                ->addTransformer(new StringMaxLength(10))
+                ->addTransformer(new Trim())
+                ->addTransformer(new StringLengthTransformer(10))
                 ->addValidator(new IsNotEmpty(), 'incorrect body')
             ->end()
             ;
@@ -154,9 +154,9 @@ class ArrayConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
     {
         $constraint = ArrayConstraint::create()
             ->addScalarConstraint('caption')
-                ->addTransformer(new StringTrim())
-                ->addValidator(new StringLength(10, StringLength::GREATER), 'incorrect caption 1')
-                ->addValidator(new StringLength(10, StringLength::GREATER), 'incorrect caption 2')
+                ->addTransformer(new Trim())
+                ->addValidator(new StringLengthValidator(10, StringLengthValidator::GREATER), 'incorrect caption 1')
+                ->addValidator(new StringLengthValidator(10, StringLengthValidator::GREATER), 'incorrect caption 2')
             ->end();
 
         $constraint->filter(array('caption' => ' abc  '));
@@ -168,7 +168,7 @@ class ArrayConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
     {
         $constraint = ArrayConstraint::create()
             ->addScalarConstraint('caption')
-                ->addTransformer(new StringTrim())
+                ->addTransformer(new Trim())
                 ->addValidator(new IsNotEmpty(), 'incorrect caption 1')
                 ->addValidator(new IsNotEmpty(), 'incorrect caption 2')
             ->end();
@@ -233,10 +233,10 @@ class ArrayConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
 
         $constraint = ArrayConstraint::create()
             ->addScalarConstraint('key1')
-                ->addTransformer(new StringMaxLength(2))
+                ->addTransformer(new StringLengthTransformer(2))
             ->end()
             ->addScalarConstraint('key2')
-                ->addTransformer(new StringMaxLength(2))
+                ->addTransformer(new StringLengthTransformer(2))
             ->end();
 
         $constraint->filter($inputArr);
@@ -265,10 +265,10 @@ class ArrayConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
     {
         $constraint = ArrayConstraint::create()
             ->addScalarConstraint('username')
-                ->addValidator(new StringLength(2, StringLength::GREATER))
+                ->addValidator(new StringLengthValidator(2, StringLengthValidator::GREATER))
             ->end()
             ->addScalarConstraint('password')
-                ->addValidator(new StringLength(2, StringLength::GREATER))
+                ->addValidator(new StringLengthValidator(2, StringLengthValidator::GREATER))
                 ->addCallableValidator(function($value, ScalarConstraint $constraint) {
                     return $value == $constraint->getParent()->get('username')->getValue();
                 })

@@ -1,10 +1,11 @@
 <?php
 
-namespace Butterfly\Component\Form\Transform\String;
+namespace Butterfly\Component\Form\Transform;
 
-use Butterfly\Component\Form\Transform\ITransformer;
-
-class StringTrim implements ITransformer
+/**
+ * @author Marat Fakhertdinov <marat.fakhertdinov@gmail.com>
+ */
+class Trim implements ITransformer
 {
     const TRIM_ALL      = 'all';
     const TRIM_LEFT     = 'left';
@@ -13,7 +14,7 @@ class StringTrim implements ITransformer
     /**
      * @var string
      */
-    protected $target;
+    protected $mode;
 
     /**
      * @var string
@@ -21,12 +22,12 @@ class StringTrim implements ITransformer
     protected $charlist;
 
     /**
-     * @param string $target
+     * @param string $mode
      * @param string $charlist
      */
-    public function __construct($target = self::TRIM_ALL, $charlist = " \t\n\r\0\x0B")
+    public function __construct($mode = self::TRIM_ALL, $charlist = " \t\n\r\0\x0B")
     {
-        $this->target   = $target;
+        $this->mode     = $mode;
         $this->charlist = $charlist;
     }
 
@@ -41,7 +42,7 @@ class StringTrim implements ITransformer
             throw new \InvalidArgumentException(sprintf('Value type is not string'));
         }
 
-        switch ($this->target) {
+        switch ($this->mode) {
             case self::TRIM_LEFT:
                 return ltrim($value, $this->charlist);
             case self::TRIM_RIGTH:
