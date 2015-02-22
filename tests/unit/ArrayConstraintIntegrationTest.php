@@ -7,7 +7,7 @@ use Butterfly\Component\Form\IConstraint;
 use Butterfly\Component\Form\ScalarConstraint;
 use Butterfly\Component\Form\Transform\String\StringMaxLength;
 use Butterfly\Component\Form\Transform\String\StringTrim;
-use Butterfly\Component\Form\Transform\Type\ToString;
+use Butterfly\Component\Form\Transform\ToType;
 use Butterfly\Component\Form\Validation\IsNotEmpty;
 use Butterfly\Component\Form\Validation\IsNotNull;
 use Butterfly\Component\Form\Validation\StringLength;
@@ -292,10 +292,10 @@ class ArrayConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
 
         $constraint = ArrayConstraint::create()
             ->addScalarConstraint('username')
-                ->addTransformer(new ToString())
+                ->addTransformer(new ToType(ToType::TYPE_STRING))
             ->end()
             ->addScalarConstraint('password')
-                ->addTransformer(new ToString())
+                ->addTransformer(new ToType(ToType::TYPE_STRING))
             ->end()
             ->addSyntheticConstraint('user')
                 ->addCallableTransformer(function(ArrayConstraint $form) use ($userRepository) {
