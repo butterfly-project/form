@@ -3,7 +3,7 @@
 namespace Butterfly\Component\Form\Filter;
 
 use Butterfly\Component\Form\IConstraint;
-use Butterfly\Component\Transform\ITransformer;
+use Butterfly\Component\Form\Transform\ITransformer;
 
 class CallableTransformerAdapter implements ITransformer
 {

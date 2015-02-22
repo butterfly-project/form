@@ -2,7 +2,7 @@
 
 namespace Butterfly\Component\Form\Filter;
 
-use Butterfly\Component\Validation\IValidator;
+use Butterfly\Component\Form\Validation\IValidator;
 
 class ValidatorChainAdapter
 {

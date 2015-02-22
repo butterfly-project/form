@@ -3,7 +3,7 @@
 namespace Butterfly\Component\Form\Filter;
 
 use Butterfly\Component\Form\IConstraint;
-use Butterfly\Component\Validation\IValidator;
+use Butterfly\Component\Form\Validation\IValidator;
 
 class CallableValidatorAdapter implements IValidator
 {
