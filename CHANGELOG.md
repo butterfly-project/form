@@ -1,10 +1,24 @@
 CHANGELOG
 =========
 
+1.1.0
+-----
+
+Changes:
+
+ * Merge package with transform and validation packages
+ * Renamed transformers: StringMaxLength to StringLength, StringTrim to Trim
+
+Added functionality:
+
+ * Added validators: ArrayContains, ArrayCount, ArrayHasKey, Composite, 
+   InArray, Instance, IsEmpty, IsNotEmpty, RegExp, Type
+ * Added transformers: Mapper, ToDateTime, ToType
+
 1.0.5
 -----
 
-Fix bug:
+Changes:
 
  * Fix bug for modify constraints filter during
 
