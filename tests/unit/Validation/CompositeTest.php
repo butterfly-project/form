@@ -124,6 +124,21 @@ class CompositeTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testCheckIfIncorrectOperation()
+    {
+        $validators = array(
+            $this->getValidator(),
+            $this->getValidator(),
+        );
+
+        $validator = new Composite('undefined', $validators);
+
+        $validator->check(1);
+    }
+
+    /**
      * @return \PHPUnit_Framework_MockObject_MockObject|IValidator
      */
     protected function getValidator()
