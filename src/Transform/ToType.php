@@ -2,6 +2,9 @@
 
 namespace Butterfly\Component\Form\Transform;
 
+/**
+ * @author Marat Fakhertdinov <marat.fakhertdinov@gmail.com>
+ */
 class ToType implements ITransformer
 {
     const TYPE_BOOL   = 'bool';

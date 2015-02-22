@@ -2,6 +2,9 @@
 
 namespace Butterfly\Component\Form\Transform;
 
+/**
+ * @author Marat Fakhertdinov <marat.fakhertdinov@gmail.com>
+ */
 class Composite implements ITransformer
 {
     /**
