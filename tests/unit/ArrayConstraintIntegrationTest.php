@@ -5,6 +5,16 @@ namespace Butterfly\Component\Form\Tests;
 use Butterfly\Component\Form\ArrayConstraint;
 use Butterfly\Component\Form\IConstraint;
 use Butterfly\Component\Form\ScalarConstraint;
+use Butterfly\Component\Form\Tests\Stub\SmsWithArrayAccess;
+use Butterfly\Component\Form\Tests\Stub\SmsWithGetters;
+use Butterfly\Component\Form\Tests\Stub\SmsWithGettersWithProtected;
+use Butterfly\Component\Form\Tests\Stub\SmsWithMagicGet;
+use Butterfly\Component\Form\Tests\Stub\SmsWithMagicGetAndIsset;
+use Butterfly\Component\Form\Tests\Stub\SmsWithPublicField;
+use Butterfly\Component\Form\Tests\Stub\SmsWithPublicStaticField1;
+use Butterfly\Component\Form\Tests\Stub\SmsWithPublicStaticField2;
+use Butterfly\Component\Form\Tests\Stub\SmsWithStaticGetters1;
+use Butterfly\Component\Form\Tests\Stub\SmsWithStaticGetters2;
 use Butterfly\Component\Form\Transform\StringLength as StringLengthTransformer;
 use Butterfly\Component\Form\Transform\Trim;
 use Butterfly\Component\Form\Transform\ToType;
@@ -456,5 +466,53 @@ class ArrayConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
         ;
 
         $constraint->filter($value);
+    }
+
+    public function getDataForTestFilterIfValueIsObject()
+    {
+        return array(
+            array(new SmsWithArrayAccess('81112223344', 'body'), true, 'filter object with array access - success'),
+            array(new SmsWithArrayAccess('', ''), false, 'filter object with array access - fail'),
+
+            array(new SmsWithPublicField('81112223344', 'body'), true, 'filter object with public fields - success'),
+            array(new SmsWithPublicField('', ''), false, 'filter object with public fields - fail'),
+
+            array(new SmsWithPublicStaticField1('81112223344', 'body'), true, 'filter object with public static fields - success'),
+            array(new SmsWithPublicStaticField2('', ''), false, 'filter object with public static fields - fail'),
+
+            array(new SmsWithGetters('81112223344', 'body'), true, 'filter object with getters - success'),
+            array(new SmsWithGetters('', ''), false, 'filter object with getters - fail'),
+            array(new SmsWithGettersWithProtected('81112223344', 'body'), false, 'filter object with protected getters - fail'),
+
+            array(new SmsWithStaticGetters1('81112223344', 'body'), true, 'filter object with static getters - success'),
+            array(new SmsWithStaticGetters2('', ''), false, 'filter object with static getters - fail'),
+
+            array(new SmsWithMagicGet('81112223344', 'body'), true, 'filter object with magic get - success'),
+            array(new SmsWithMagicGet('', ''), false, 'filter object with magic get - fail'),
+
+            array(new SmsWithMagicGetAndIsset('81112223344'), false, 'filter object with magic get and isset - fail'),
+        );
+    }
+
+    /**
+     * @dataProvider getDataForTestFilterIfValueIsObject
+     *
+     * @param mixed $value
+     * @param bool $expectedResult
+     * @param string $caseMessage
+     */
+    public function testFilterIfValueIsObject($value, $expectedResult, $caseMessage)
+    {
+        $constraint = ArrayConstraint::create()
+            ->addScalarConstraint('phone')
+                ->addValidator(new IsNotEmpty(), 'Phone can not be empty')
+            ->end()
+            ->addScalarConstraint('body')
+                ->addValidator(new IsNotEmpty(), 'Body can not be empty')
+            ->end();
+
+        $constraint->filter($value);
+
+        $this->assertEquals($expectedResult, $constraint->isValid(), $caseMessage);
     }
 }

@@ -150,16 +150,71 @@ class ArrayConstraint implements IConstraint, \Countable, \IteratorAggregate, \A
 
             if ($constraint instanceof SyntheticConstraint) {
                 $fieldValue = $this;
-            } elseif (array_key_exists($key, $value)) {
-                $fieldValue = $value[$key];
+            } elseif (is_array($value)) {
+                $fieldValue = $this->getArrayValue($value, $key);
+            } elseif ($value instanceof \ArrayAccess) {
+                $fieldValue = $value->offsetExists($key) ? $value->offsetGet($key) : null;
+            } elseif (is_object($value)) {
+                $fieldValue = $this->getObjectValue($value, $key);
             } else {
-                $fieldValue = null;
+                throw new \InvalidArgumentException(sprintf(
+                    "Expected array or object value. Given: %s",
+                    var_export($value, true)
+                ));
             }
 
             $constraint->filter($fieldValue);
         }
 
         return $this;
+    }
+
+    /**
+     * @param array $value
+     * @param string|int $key
+     * @return mixed|null
+     */
+    protected function getArrayValue($value, $key)
+    {
+        return array_key_exists($key, $value) ? $value[$key] : null;
+    }
+
+    /**
+     * @param object $value
+     * @param string $key
+     * @return mixed|null
+     */
+    protected function getObjectValue($value, $key)
+    {
+        $reflectionObject = new \ReflectionClass($value);
+
+        if ($reflectionObject->hasProperty($key)) {
+            $reflectionProperty = $reflectionObject->getProperty($key);
+
+            if ($reflectionProperty->isPublic()) {
+                return $reflectionProperty->getValue($value);
+            }
+        }
+
+        $getterMethodName = 'get' . ucfirst($key);
+
+        if ($reflectionObject->hasMethod($getterMethodName)) {
+            $reflectionMethod = $reflectionObject->getMethod($getterMethodName);
+
+            if ($reflectionMethod->isPublic()) {
+                return call_user_func(array($value, $getterMethodName));
+            }
+        }
+
+        if ($reflectionObject->hasMethod('__get')) {
+            $hasMagicIsset = $reflectionObject->hasMethod('__isset');
+
+            if (!$hasMagicIsset || ($hasMagicIsset && isset($value->$key)))  {
+                return call_user_func(array($value, '__get'), $key);
+            }
+        }
+
+        return null;
     }
 
     /**
