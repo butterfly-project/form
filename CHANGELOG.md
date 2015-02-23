@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+1.2.0
+-----
+
+Added functionality:
+
+ * Added List constraint
+ * Added filtering object in ArrayConstraint
+ 
+Changes:
+ * Updated IConstraint
+
 1.1.0
 -----
 
