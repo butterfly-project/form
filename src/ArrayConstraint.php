@@ -142,6 +142,7 @@ class ArrayConstraint implements IConstraint, \Countable, \IteratorAggregate, \A
     /**
      * @param mixed $value
      * @return $this
+     * @throws \InvalidArgumentException if incorrect value type
      */
     public function filter($value)
     {
@@ -158,7 +159,7 @@ class ArrayConstraint implements IConstraint, \Countable, \IteratorAggregate, \A
                 $fieldValue = $this->getObjectValue($value, $key);
             } else {
                 throw new \InvalidArgumentException(sprintf(
-                    "Expected array or object value. Given: %s",
+                    "Incrorrect value type. Expected array or object value. Given: %s",
                     var_export($value, true)
                 ));
             }
@@ -241,6 +242,21 @@ class ArrayConstraint implements IConstraint, \Countable, \IteratorAggregate, \A
     }
 
     /**
+     * @param mixed $label
+     * @return bool
+     */
+    public function hasValue($label)
+    {
+        foreach ($this->constraints as $constraint) {
+            if (!$constraint->hasValue($label)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * @return bool
      */
     public function isValid()
@@ -282,6 +298,16 @@ class ArrayConstraint implements IConstraint, \Countable, \IteratorAggregate, \A
         }
 
         return null;
+    }
+
+    /**
+     * @return void
+     */
+    public function clean()
+    {
+        foreach ($this->constraints as $constraint) {
+            $constraint->clean();
+        }
     }
 
     /**

@@ -200,6 +200,15 @@ class ScalarConstraint implements IConstraint
     }
 
     /**
+     * @param string $label
+     * @return bool
+     */
+    public function hasValue($label)
+    {
+        return array_key_exists($label, $this->values);
+    }
+
+    /**
      * @return bool
      */
     public function isValid()
@@ -223,5 +232,14 @@ class ScalarConstraint implements IConstraint
         $message = reset($this->errorMessages);
 
         return (false === $message) ? null : $message;
+    }
+
+    /**
+     * @return void
+     */
+    public function clean()
+    {
+        $this->values        = array();
+        $this->errorMessages = array();
     }
 }

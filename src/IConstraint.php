@@ -44,4 +44,15 @@ interface IConstraint
      * @return mixed
      */
     public function getOldValue();
+
+    /**
+     * @param mixed $label
+     * @return bool
+     */
+    public function hasValue($label);
+
+    /**
+     * @return void
+     */
+    public function clean();
 }

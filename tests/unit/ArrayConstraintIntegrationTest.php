@@ -119,6 +119,47 @@ class ArrayConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
         $this->assertCount($expectedCountErrors, $constraint->getErrorMessages());
     }
 
+    public function testHasValue()
+    {
+        $value = array(
+            'phone' => '',
+            'body'  => '',
+        );
+
+        $constraint = ArrayConstraint::create()
+            ->addScalarConstraint('phone')
+                ->addValidator(new IsNotEmpty(), 'Phone can not be empty')
+            ->end()
+            ->addScalarConstraint('body')
+                ->addValidator(new IsNotEmpty(), 'Body can not be empty')
+            ->end();
+
+        $constraint->filter($value);
+
+        $this->assertTrue($constraint->hasValue(IConstraint::VALUE_BEFORE));
+        $this->assertTrue($constraint->hasValue(IConstraint::VALUE_AFTER));
+    }
+
+    public function testHasValueIfUndefinedLabel()
+    {
+        $value = array(
+            'phone' => '',
+            'body'  => '',
+        );
+
+        $constraint = ArrayConstraint::create()
+            ->addScalarConstraint('phone')
+                ->addValidator(new IsNotEmpty(), 'Phone can not be empty')
+            ->end()
+            ->addScalarConstraint('body')
+                ->addValidator(new IsNotEmpty(), 'Body can not be empty')
+            ->end();
+
+        $constraint->filter($value);
+
+        $this->assertFalse($constraint->hasValue('undefined'));
+    }
+
     public function testParent()
     {
         $parent = $this->getArrayConstraint();
@@ -514,5 +555,51 @@ class ArrayConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
         $constraint->filter($value);
 
         $this->assertEquals($expectedResult, $constraint->isValid(), $caseMessage);
+    }
+
+    public function testClean()
+    {
+        $value = array(
+            'phone' => '',
+            'body'  => '',
+        );
+
+        $constraint = ArrayConstraint::create()
+            ->addScalarConstraint('phone')
+                ->addValidator(new IsNotEmpty(), 'Phone can not be empty')
+            ->end()
+            ->addScalarConstraint('body')
+                ->addValidator(new IsNotEmpty(), 'Body can not be empty')
+            ->end();
+
+        $constraint->filter($value);
+
+        $this->assertFalse($constraint->isValid());
+        $this->assertCount(2, $constraint->getErrorMessages());
+        $this->assertTrue($constraint->hasValue(IConstraint::VALUE_BEFORE));
+        $this->assertTrue($constraint->hasValue(IConstraint::VALUE_AFTER));
+
+        $constraint->clean();
+
+        $this->assertTrue($constraint->isValid());
+        $this->assertCount(0, $constraint->getErrorMessages());
+        $this->assertFalse($constraint->hasValue(IConstraint::VALUE_BEFORE));
+        $this->assertFalse($constraint->hasValue(IConstraint::VALUE_AFTER));
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testFilterIfIncorrectValueType()
+    {
+        $constraint = ArrayConstraint::create()
+            ->addScalarConstraint('phone')
+                ->addValidator(new IsNotEmpty(), 'Phone can not be empty')
+            ->end()
+            ->addScalarConstraint('body')
+                ->addValidator(new IsNotEmpty(), 'Body can not be empty')
+            ->end();
+
+        $constraint->filter(1);
     }
 }

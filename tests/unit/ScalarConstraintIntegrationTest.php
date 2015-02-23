@@ -8,6 +8,7 @@ use Butterfly\Component\Form\ScalarConstraint;
 use Butterfly\Component\Form\Transform\StringLength as StringLengthTransformer;
 use Butterfly\Component\Form\Transform\Trim;
 use Butterfly\Component\Form\Validation\Compare;
+use Butterfly\Component\Form\Validation\IsNotEmpty;
 use Butterfly\Component\Form\Validation\IsNull;
 use Butterfly\Component\Form\Validation\StringLength as StringLengthValidator;
 
@@ -35,10 +36,30 @@ class ScalarConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
         $constraint = ScalarConstraint::create()
             ->addTransformer(new Trim());
 
-
         $constraint->filter(' abc ');
 
         $constraint->getValue('undefined');
+    }
+
+    public function testHasValue()
+    {
+        $constraint = ScalarConstraint::create()
+            ->addTransformer(new Trim());
+
+        $constraint->filter(' abc ');
+
+        $this->assertTrue($constraint->hasValue(IConstraint::VALUE_BEFORE));
+        $this->assertTrue($constraint->hasValue(IConstraint::VALUE_AFTER));
+    }
+
+    public function testHasValueIfUndefinedLabel()
+    {
+        $constraint = ScalarConstraint::create()
+            ->addTransformer(new Trim());
+
+        $constraint->filter(' abc ');
+
+        $this->assertFalse($constraint->hasValue('undefined'));
     }
 
     public function testCallableTransformer()
@@ -191,5 +212,26 @@ class ScalarConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('abc', $constraint->getValue('label1'));
         $this->assertEquals('a', $constraint->getValue('label2'));
+    }
+
+    public function testClean()
+    {
+        $constraint = ScalarConstraint::create()
+            ->addTransformer(new Trim())
+            ->addValidator(new IsNotEmpty(), 'Value can not be empty');
+
+        $constraint->filter(' ');
+
+        $this->assertFalse($constraint->isValid());
+        $this->assertCount(1, $constraint->getErrorMessages());
+        $this->assertTrue($constraint->hasValue(IConstraint::VALUE_BEFORE));
+        $this->assertTrue($constraint->hasValue(IConstraint::VALUE_AFTER));
+
+        $constraint->clean();
+
+        $this->assertTrue($constraint->isValid());
+        $this->assertCount(0, $constraint->getErrorMessages());
+        $this->assertFalse($constraint->hasValue(IConstraint::VALUE_BEFORE));
+        $this->assertFalse($constraint->hasValue(IConstraint::VALUE_AFTER));
     }
 }
