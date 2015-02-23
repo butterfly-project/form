@@ -10,6 +10,9 @@ use Butterfly\Component\Form\Filter\ValidatorChainAdapter;
 use Butterfly\Component\Form\Transform\ITransformer;
 use Butterfly\Component\Form\Validation\IValidator;
 
+/**
+ * @author Marat Fakhertdinov <marat.fakhertdinov@gmail.com>
+ */
 class ScalarConstraint implements IConstraint
 {
     /**
@@ -41,10 +44,10 @@ class ScalarConstraint implements IConstraint
     }
 
     /**
-     * @param ArrayConstraint|null $parent
+     * @param IConstraint|null $parent
      * @return ScalarConstraint
      */
-    public function setParent(ArrayConstraint $parent)
+    public function setParent(IConstraint $parent)
     {
         $this->parent = $parent;
 
@@ -52,7 +55,7 @@ class ScalarConstraint implements IConstraint
     }
 
     /**
-     * @return ArrayConstraint|null
+     * @return ArrayConstraint|ListConstraint|null
      */
     public function end()
     {
@@ -60,7 +63,7 @@ class ScalarConstraint implements IConstraint
     }
 
     /**
-     * @return ArrayConstraint|null
+     * @return ArrayConstraint|ListConstraint|null
      */
     public function getParent()
     {
@@ -200,6 +203,15 @@ class ScalarConstraint implements IConstraint
     }
 
     /**
+     * @param string $label
+     * @return bool
+     */
+    public function hasValue($label)
+    {
+        return array_key_exists($label, $this->values);
+    }
+
+    /**
      * @return bool
      */
     public function isValid()
@@ -223,5 +235,19 @@ class ScalarConstraint implements IConstraint
         $message = reset($this->errorMessages);
 
         return (false === $message) ? null : $message;
+    }
+
+    /**
+     * @return void
+     */
+    public function clean()
+    {
+        $this->values        = array();
+        $this->errorMessages = array();
+    }
+
+    public function __clone()
+    {
+        $this->clean();
     }
 }

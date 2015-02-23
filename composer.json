@@ -16,7 +16,7 @@
     "autoload": {
         "psr-4": {
             "Butterfly\\Component\\Form\\": "src/",
-            "Butterfly\\Component\\Form\\Tests\\": "tests/"
+            "Butterfly\\Component\\Form\\Tests\\": "tests/unit/"
         }
     }
 }

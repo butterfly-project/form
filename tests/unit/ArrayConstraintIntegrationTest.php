@@ -5,6 +5,16 @@ namespace Butterfly\Component\Form\Tests;
 use Butterfly\Component\Form\ArrayConstraint;
 use Butterfly\Component\Form\IConstraint;
 use Butterfly\Component\Form\ScalarConstraint;
+use Butterfly\Component\Form\Tests\Stub\SmsWithArrayAccess;
+use Butterfly\Component\Form\Tests\Stub\SmsWithGetters;
+use Butterfly\Component\Form\Tests\Stub\SmsWithGettersWithProtected;
+use Butterfly\Component\Form\Tests\Stub\SmsWithMagicGet;
+use Butterfly\Component\Form\Tests\Stub\SmsWithMagicGetAndIsset;
+use Butterfly\Component\Form\Tests\Stub\SmsWithPublicField;
+use Butterfly\Component\Form\Tests\Stub\SmsWithPublicStaticField1;
+use Butterfly\Component\Form\Tests\Stub\SmsWithPublicStaticField2;
+use Butterfly\Component\Form\Tests\Stub\SmsWithStaticGetters1;
+use Butterfly\Component\Form\Tests\Stub\SmsWithStaticGetters2;
 use Butterfly\Component\Form\Transform\StringLength as StringLengthTransformer;
 use Butterfly\Component\Form\Transform\Trim;
 use Butterfly\Component\Form\Transform\ToType;
@@ -12,6 +22,9 @@ use Butterfly\Component\Form\Validation\IsNotEmpty;
 use Butterfly\Component\Form\Validation\IsNotNull;
 use Butterfly\Component\Form\Validation\StringLength as StringLengthValidator;
 
+/**
+ * @author Marat Fakhertdinov <marat.fakhertdinov@gmail.com>
+ */
 class ArrayConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
 {
     public function getDataForTestFilter()
@@ -107,6 +120,47 @@ class ArrayConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($expectedResult, $constraint->isValid());
         $this->assertCount($expectedCountErrors, $constraint->getErrorMessages());
+    }
+
+    public function testHasValue()
+    {
+        $value = array(
+            'phone' => '',
+            'body'  => '',
+        );
+
+        $constraint = ArrayConstraint::create()
+            ->addScalarConstraint('phone')
+                ->addValidator(new IsNotEmpty(), 'Phone can not be empty')
+            ->end()
+            ->addScalarConstraint('body')
+                ->addValidator(new IsNotEmpty(), 'Body can not be empty')
+            ->end();
+
+        $constraint->filter($value);
+
+        $this->assertTrue($constraint->hasValue(IConstraint::VALUE_BEFORE));
+        $this->assertTrue($constraint->hasValue(IConstraint::VALUE_AFTER));
+    }
+
+    public function testHasValueIfUndefinedLabel()
+    {
+        $value = array(
+            'phone' => '',
+            'body'  => '',
+        );
+
+        $constraint = ArrayConstraint::create()
+            ->addScalarConstraint('phone')
+                ->addValidator(new IsNotEmpty(), 'Phone can not be empty')
+            ->end()
+            ->addScalarConstraint('body')
+                ->addValidator(new IsNotEmpty(), 'Body can not be empty')
+            ->end();
+
+        $constraint->filter($value);
+
+        $this->assertFalse($constraint->hasValue('undefined'));
     }
 
     public function testParent()
@@ -456,5 +510,130 @@ class ArrayConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
         ;
 
         $constraint->filter($value);
+    }
+
+    public function getDataForTestFilterIfValueIsObject()
+    {
+        return array(
+            array(new SmsWithArrayAccess('81112223344', 'body'), true, 'filter object with array access - success'),
+            array(new SmsWithArrayAccess('', ''), false, 'filter object with array access - fail'),
+
+            array(new SmsWithPublicField('81112223344', 'body'), true, 'filter object with public fields - success'),
+            array(new SmsWithPublicField('', ''), false, 'filter object with public fields - fail'),
+
+            array(new SmsWithPublicStaticField1('81112223344', 'body'), true, 'filter object with public static fields - success'),
+            array(new SmsWithPublicStaticField2('', ''), false, 'filter object with public static fields - fail'),
+
+            array(new SmsWithGetters('81112223344', 'body'), true, 'filter object with getters - success'),
+            array(new SmsWithGetters('', ''), false, 'filter object with getters - fail'),
+            array(new SmsWithGettersWithProtected('81112223344', 'body'), false, 'filter object with protected getters - fail'),
+
+            array(new SmsWithStaticGetters1('81112223344', 'body'), true, 'filter object with static getters - success'),
+            array(new SmsWithStaticGetters2('', ''), false, 'filter object with static getters - fail'),
+
+            array(new SmsWithMagicGet('81112223344', 'body'), true, 'filter object with magic get - success'),
+            array(new SmsWithMagicGet('', ''), false, 'filter object with magic get - fail'),
+
+            array(new SmsWithMagicGetAndIsset('81112223344'), false, 'filter object with magic get and isset - fail'),
+        );
+    }
+
+    /**
+     * @dataProvider getDataForTestFilterIfValueIsObject
+     *
+     * @param mixed $value
+     * @param bool $expectedResult
+     * @param string $caseMessage
+     */
+    public function testFilterIfValueIsObject($value, $expectedResult, $caseMessage)
+    {
+        $constraint = ArrayConstraint::create()
+            ->addScalarConstraint('phone')
+                ->addValidator(new IsNotEmpty(), 'Phone can not be empty')
+            ->end()
+            ->addScalarConstraint('body')
+                ->addValidator(new IsNotEmpty(), 'Body can not be empty')
+            ->end();
+
+        $constraint->filter($value);
+
+        $this->assertEquals($expectedResult, $constraint->isValid(), $caseMessage);
+    }
+
+    public function testClean()
+    {
+        $value = array(
+            'phone' => '',
+            'body'  => '',
+        );
+
+        $constraint = ArrayConstraint::create()
+            ->addScalarConstraint('phone')
+                ->addValidator(new IsNotEmpty(), 'Phone can not be empty')
+            ->end()
+            ->addScalarConstraint('body')
+                ->addValidator(new IsNotEmpty(), 'Body can not be empty')
+            ->end();
+
+        $constraint->filter($value);
+
+        $this->assertFalse($constraint->isValid());
+        $this->assertCount(2, $constraint->getErrorMessages());
+        $this->assertTrue($constraint->hasValue(IConstraint::VALUE_BEFORE));
+        $this->assertTrue($constraint->hasValue(IConstraint::VALUE_AFTER));
+
+        $constraint->clean();
+
+        $this->assertTrue($constraint->isValid());
+        $this->assertCount(0, $constraint->getErrorMessages());
+        $this->assertFalse($constraint->hasValue(IConstraint::VALUE_BEFORE));
+        $this->assertFalse($constraint->hasValue(IConstraint::VALUE_AFTER));
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testFilterIfIncorrectValueType()
+    {
+        $constraint = ArrayConstraint::create()
+            ->addScalarConstraint('phone')
+                ->addValidator(new IsNotEmpty(), 'Phone can not be empty')
+            ->end()
+            ->addScalarConstraint('body')
+                ->addValidator(new IsNotEmpty(), 'Body can not be empty')
+            ->end();
+
+        $constraint->filter(1);
+    }
+
+    public function testAddListConstraint()
+    {
+        $value = array(
+            'fio' => 'John Smith',
+            'phones' => array(
+                '81112223344',
+                '71112223344',
+                '61112223344',
+                '51112223344',
+            ),
+        );
+
+        $constraint = ArrayConstraint::create()
+            ->addScalarConstraint('fio')
+                ->addTransformer(new ToType(ToType::TYPE_STRING))
+                ->addTransformer(new Trim())
+                ->addValidator(new IsNotEmpty(), 'Fio can not be empty')
+            ->end()
+            ->addListConstraint('phones')
+                ->declareAsScalar()
+                    ->addTransformer(new ToType(ToType::TYPE_STRING))
+                    ->addTransformer(new Trim())
+                    ->addValidator(new IsNotEmpty(), 'Phone can not be empty')
+                ->end()
+            ->end();
+
+        $constraint->filter($value);
+
+        $this->assertTrue($constraint->isValid());
     }
 }

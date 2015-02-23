@@ -5,6 +5,9 @@ namespace Butterfly\Component\Form\Filter;
 use Butterfly\Component\Form\IConstraint;
 use Butterfly\Component\Form\Validation\IValidator;
 
+/**
+ * @author Marat Fakhertdinov <marat.fakhertdinov@gmail.com>
+ */
 class CallableValidatorAdapter implements IValidator
 {
     /**

@@ -2,8 +2,9 @@
 
 namespace Butterfly\Component\Form;
 
-use Traversable;
-
+/**
+ * @author Marat Fakhertdinov <marat.fakhertdinov@gmail.com>
+ */
 class ArrayConstraint implements IConstraint, \Countable, \IteratorAggregate, \ArrayAccess
 {
     /**
@@ -17,7 +18,7 @@ class ArrayConstraint implements IConstraint, \Countable, \IteratorAggregate, \A
     protected $iterator;
 
     /**
-     * @var ArrayConstraint|null
+     * @var ArrayConstraint|ListConstraint|null
      */
     protected $parent;
 
@@ -35,10 +36,10 @@ class ArrayConstraint implements IConstraint, \Countable, \IteratorAggregate, \A
     }
 
     /**
-     * @param ArrayConstraint|null $parent
+     * @param IConstraint|null $parent
      * @return ArrayConstraint
      */
-    public function setParent(ArrayConstraint $parent)
+    public function setParent(IConstraint $parent)
     {
         $this->parent = $parent;
 
@@ -63,19 +64,6 @@ class ArrayConstraint implements IConstraint, \Countable, \IteratorAggregate, \A
 
     /**
      * @param string $key
-     * @return SyntheticConstraint
-     */
-    public function addSyntheticConstraint($key)
-    {
-        $constraint = new SyntheticConstraint();
-
-        $this->addConstraint($key, $constraint);
-
-        return $constraint;
-    }
-
-    /**
-     * @param string $key
      * @return ScalarConstraint
      */
     public function addScalarConstraint($key)
@@ -94,6 +82,32 @@ class ArrayConstraint implements IConstraint, \Countable, \IteratorAggregate, \A
     public function addArrayConstraint($key)
     {
         $constraint = new ArrayConstraint();
+
+        $this->addConstraint($key, $constraint);
+
+        return $constraint;
+    }
+
+    /**
+     * @param string $key
+     * @return ListConstraint
+     */
+    public function addListConstraint($key)
+    {
+        $constraint = new ListConstraint();
+
+        $this->addConstraint($key, $constraint);
+
+        return $constraint;
+    }
+
+    /**
+     * @param string $key
+     * @return SyntheticConstraint
+     */
+    public function addSyntheticConstraint($key)
+    {
+        $constraint = new SyntheticConstraint();
 
         $this->addConstraint($key, $constraint);
 
@@ -142,6 +156,7 @@ class ArrayConstraint implements IConstraint, \Countable, \IteratorAggregate, \A
     /**
      * @param mixed $value
      * @return $this
+     * @throws \InvalidArgumentException if incorrect value type
      */
     public function filter($value)
     {
@@ -150,16 +165,71 @@ class ArrayConstraint implements IConstraint, \Countable, \IteratorAggregate, \A
 
             if ($constraint instanceof SyntheticConstraint) {
                 $fieldValue = $this;
-            } elseif (array_key_exists($key, $value)) {
-                $fieldValue = $value[$key];
+            } elseif (is_array($value)) {
+                $fieldValue = $this->getArrayValue($value, $key);
+            } elseif ($value instanceof \ArrayAccess) {
+                $fieldValue = $value->offsetExists($key) ? $value->offsetGet($key) : null;
+            } elseif (is_object($value)) {
+                $fieldValue = $this->getObjectValue($value, $key);
             } else {
-                $fieldValue = null;
+                throw new \InvalidArgumentException(sprintf(
+                    "Incrorrect value type. Expected array or object value. Given: %s",
+                    var_export($value, true)
+                ));
             }
 
             $constraint->filter($fieldValue);
         }
 
         return $this;
+    }
+
+    /**
+     * @param array $value
+     * @param string|int $key
+     * @return mixed|null
+     */
+    protected function getArrayValue($value, $key)
+    {
+        return array_key_exists($key, $value) ? $value[$key] : null;
+    }
+
+    /**
+     * @param object $value
+     * @param string $key
+     * @return mixed|null
+     */
+    protected function getObjectValue($value, $key)
+    {
+        $reflectionObject = new \ReflectionClass($value);
+
+        if ($reflectionObject->hasProperty($key)) {
+            $reflectionProperty = $reflectionObject->getProperty($key);
+
+            if ($reflectionProperty->isPublic()) {
+                return $reflectionProperty->getValue($value);
+            }
+        }
+
+        $getterMethodName = 'get' . ucfirst($key);
+
+        if ($reflectionObject->hasMethod($getterMethodName)) {
+            $reflectionMethod = $reflectionObject->getMethod($getterMethodName);
+
+            if ($reflectionMethod->isPublic()) {
+                return call_user_func(array($value, $getterMethodName));
+            }
+        }
+
+        if ($reflectionObject->hasMethod('__get')) {
+            $hasMagicIsset = $reflectionObject->hasMethod('__isset');
+
+            if (!$hasMagicIsset || ($hasMagicIsset && isset($value->$key)))  {
+                return call_user_func(array($value, '__get'), $key);
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -183,6 +253,21 @@ class ArrayConstraint implements IConstraint, \Countable, \IteratorAggregate, \A
         }
 
         return $values;
+    }
+
+    /**
+     * @param mixed $label
+     * @return bool
+     */
+    public function hasValue($label)
+    {
+        foreach ($this->constraints as $constraint) {
+            if (!$constraint->hasValue($label)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -230,10 +315,20 @@ class ArrayConstraint implements IConstraint, \Countable, \IteratorAggregate, \A
     }
 
     /**
+     * @return void
+     */
+    public function clean()
+    {
+        foreach ($this->constraints as $constraint) {
+            $constraint->clean();
+        }
+    }
+
+    /**
      * (PHP 5 &gt;= 5.0.0)<br/>
      * Retrieve an external iterator
      * @link http://php.net/manual/en/iteratoraggregate.getiterator.php
-     * @return Traversable An instance of an object implementing <b>Iterator</b> or
+     * @return \Traversable An instance of an object implementing <b>Iterator</b> or
      * <b>Traversable</b>
      */
     public function getIterator()
@@ -315,5 +410,18 @@ class ArrayConstraint implements IConstraint, \Countable, \IteratorAggregate, \A
     public function offsetUnset($offset)
     {
         throw new \RuntimeException('Can not be unset');
+    }
+
+    public function __clone()
+    {
+        $constraints = array();
+
+        foreach ($this->constraints as $key => $constraint) {
+            $constraints[$key] = clone $constraint;
+        }
+
+        $this->constraints = $constraints;
+
+        $this->iterator = clone $this->iterator;
     }
 }
