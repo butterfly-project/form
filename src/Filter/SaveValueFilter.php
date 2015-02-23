@@ -2,6 +2,9 @@
 
 namespace Butterfly\Component\Form\Filter;
 
+/**
+ * @author Marat Fakhertdinov <marat.fakhertdinov@gmail.com>
+ */
 class SaveValueFilter
 {
     /**

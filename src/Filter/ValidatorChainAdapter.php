@@ -4,6 +4,9 @@ namespace Butterfly\Component\Form\Filter;
 
 use Butterfly\Component\Form\Validation\IValidator;
 
+/**
+ * @author Marat Fakhertdinov <marat.fakhertdinov@gmail.com>
+ */
 class ValidatorChainAdapter
 {
     /**

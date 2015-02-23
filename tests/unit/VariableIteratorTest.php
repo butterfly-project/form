@@ -2,18 +2,11 @@
 
 namespace Butterfly\Component\Form\Tests;
 
-use Butterfly\Component\Form\ArrayConstraint;
-use Butterfly\Component\Form\IConstraint;
-use Butterfly\Component\Form\ScalarConstraint;
 use Butterfly\Component\Form\VariableIterator;
-use Butterfly\Component\Transform\String\StringMaxLength;
-use Butterfly\Component\Transform\String\StringTrim;
-use Butterfly\Component\Validation\Compare;
-use Butterfly\Component\Validation\IsNull;
-use Butterfly\Component\Validation\String\StringLengthGreat;
-use Butterfly\Component\Validation\String\StringLengthGreatOrEqual;
-use Butterfly\Component\Validation\String\StringLengthLessOrEqual;
 
+/**
+ * @author Marat Fakhertdinov <marat.fakhertdinov@gmail.com>
+ */
 class VariableIteratorTest extends \PHPUnit_Framework_TestCase
 {
     public function testIterable()

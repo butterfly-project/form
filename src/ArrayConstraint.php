@@ -2,8 +2,9 @@
 
 namespace Butterfly\Component\Form;
 
-use Traversable;
-
+/**
+ * @author Marat Fakhertdinov <marat.fakhertdinov@gmail.com>
+ */
 class ArrayConstraint implements IConstraint, \Countable, \IteratorAggregate, \ArrayAccess
 {
     /**
@@ -17,7 +18,7 @@ class ArrayConstraint implements IConstraint, \Countable, \IteratorAggregate, \A
     protected $iterator;
 
     /**
-     * @var ArrayConstraint|null
+     * @var ArrayConstraint|ListConstraint|null
      */
     protected $parent;
 
@@ -35,10 +36,10 @@ class ArrayConstraint implements IConstraint, \Countable, \IteratorAggregate, \A
     }
 
     /**
-     * @param ArrayConstraint|null $parent
+     * @param IConstraint|null $parent
      * @return ArrayConstraint
      */
-    public function setParent(ArrayConstraint $parent)
+    public function setParent(IConstraint $parent)
     {
         $this->parent = $parent;
 
@@ -63,19 +64,6 @@ class ArrayConstraint implements IConstraint, \Countable, \IteratorAggregate, \A
 
     /**
      * @param string $key
-     * @return SyntheticConstraint
-     */
-    public function addSyntheticConstraint($key)
-    {
-        $constraint = new SyntheticConstraint();
-
-        $this->addConstraint($key, $constraint);
-
-        return $constraint;
-    }
-
-    /**
-     * @param string $key
      * @return ScalarConstraint
      */
     public function addScalarConstraint($key)
@@ -94,6 +82,32 @@ class ArrayConstraint implements IConstraint, \Countable, \IteratorAggregate, \A
     public function addArrayConstraint($key)
     {
         $constraint = new ArrayConstraint();
+
+        $this->addConstraint($key, $constraint);
+
+        return $constraint;
+    }
+
+    /**
+     * @param string $key
+     * @return ListConstraint
+     */
+    public function addListConstraint($key)
+    {
+        $constraint = new ListConstraint();
+
+        $this->addConstraint($key, $constraint);
+
+        return $constraint;
+    }
+
+    /**
+     * @param string $key
+     * @return SyntheticConstraint
+     */
+    public function addSyntheticConstraint($key)
+    {
+        $constraint = new SyntheticConstraint();
 
         $this->addConstraint($key, $constraint);
 
@@ -314,7 +328,7 @@ class ArrayConstraint implements IConstraint, \Countable, \IteratorAggregate, \A
      * (PHP 5 &gt;= 5.0.0)<br/>
      * Retrieve an external iterator
      * @link http://php.net/manual/en/iteratoraggregate.getiterator.php
-     * @return Traversable An instance of an object implementing <b>Iterator</b> or
+     * @return \Traversable An instance of an object implementing <b>Iterator</b> or
      * <b>Traversable</b>
      */
     public function getIterator()
@@ -396,5 +410,18 @@ class ArrayConstraint implements IConstraint, \Countable, \IteratorAggregate, \A
     public function offsetUnset($offset)
     {
         throw new \RuntimeException('Can not be unset');
+    }
+
+    public function __clone()
+    {
+        $constraints = array();
+
+        foreach ($this->constraints as $key => $constraint) {
+            $constraints[$key] = clone $constraint;
+        }
+
+        $this->constraints = $constraints;
+
+        $this->iterator = clone $this->iterator;
     }
 }

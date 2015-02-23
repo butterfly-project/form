@@ -22,6 +22,9 @@ use Butterfly\Component\Form\Validation\IsNotEmpty;
 use Butterfly\Component\Form\Validation\IsNotNull;
 use Butterfly\Component\Form\Validation\StringLength as StringLengthValidator;
 
+/**
+ * @author Marat Fakhertdinov <marat.fakhertdinov@gmail.com>
+ */
 class ArrayConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
 {
     public function getDataForTestFilter()
@@ -601,5 +604,36 @@ class ArrayConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
             ->end();
 
         $constraint->filter(1);
+    }
+
+    public function testAddListConstraint()
+    {
+        $value = array(
+            'fio' => 'John Smith',
+            'phones' => array(
+                '81112223344',
+                '71112223344',
+                '61112223344',
+                '51112223344',
+            ),
+        );
+
+        $constraint = ArrayConstraint::create()
+            ->addScalarConstraint('fio')
+                ->addTransformer(new ToType(ToType::TYPE_STRING))
+                ->addTransformer(new Trim())
+                ->addValidator(new IsNotEmpty(), 'Fio can not be empty')
+            ->end()
+            ->addListConstraint('phones')
+                ->declareAsScalar()
+                    ->addTransformer(new ToType(ToType::TYPE_STRING))
+                    ->addTransformer(new Trim())
+                    ->addValidator(new IsNotEmpty(), 'Phone can not be empty')
+                ->end()
+            ->end();
+
+        $constraint->filter($value);
+
+        $this->assertTrue($constraint->isValid());
     }
 }

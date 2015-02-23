@@ -2,6 +2,9 @@
 
 namespace Butterfly\Component\Form;
 
+/**
+ * @author Marat Fakhertdinov <marat.fakhertdinov@gmail.com>
+ */
 interface IConstraint
 {
     const VALUE_BEFORE  = 'before';
@@ -29,16 +32,21 @@ interface IConstraint
     public function getFirstErrorMessage();
 
     /**
-     * @param ArrayConstraint $parent
+     * @param IConstraint $parent
      * @return void
      */
-    public function setParent(ArrayConstraint $parent);
+    public function setParent(IConstraint $parent);
+
+    /**
+     * @return IConstraint
+     */
+    public function getParent();
 
     /**
      * @param mixed $label
      * @return mixed
      */
-    public function getValue($label);
+    public function getValue($label = IConstraint::VALUE_AFTER);
 
     /**
      * @return mixed

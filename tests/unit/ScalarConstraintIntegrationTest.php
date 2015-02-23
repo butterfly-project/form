@@ -12,6 +12,9 @@ use Butterfly\Component\Form\Validation\IsNotEmpty;
 use Butterfly\Component\Form\Validation\IsNull;
 use Butterfly\Component\Form\Validation\StringLength as StringLengthValidator;
 
+/**
+ * @author Marat Fakhertdinov <marat.fakhertdinov@gmail.com>
+ */
 class ScalarConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
 {
     public function testTransformer()

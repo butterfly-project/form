@@ -2,6 +2,9 @@
 
 namespace Butterfly\Component\Form;
 
+/**
+ * @author Marat Fakhertdinov <marat.fakhertdinov@gmail.com>
+ */
 class SyntheticConstraint extends ScalarConstraint
 {
     /**
