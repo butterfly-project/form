@@ -38,7 +38,7 @@ interface IConstraint
     public function setParent(IConstraint $parent);
 
     /**
-     * @return IConstraint
+     * @return ArrayConstraint
      */
     public function getParent();
 

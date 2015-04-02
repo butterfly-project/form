@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+1.3.0
+-----
+
+Added functionality:
+
+ * Added email validator
+
 1.2.0
 -----
 
