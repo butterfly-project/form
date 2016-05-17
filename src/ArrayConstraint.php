@@ -23,6 +23,11 @@ class ArrayConstraint implements IConstraint, \Countable, \IteratorAggregate, \A
     protected $parent;
 
     /**
+     * @var bool
+     */
+    protected $isFiltered = false;
+
+    /**
      * @return ArrayConstraint
      */
     public static function create()
@@ -181,6 +186,8 @@ class ArrayConstraint implements IConstraint, \Countable, \IteratorAggregate, \A
             $constraint->filter($fieldValue);
         }
 
+        $this->isFiltered = true;
+
         return $this;
     }
 
@@ -273,6 +280,14 @@ class ArrayConstraint implements IConstraint, \Countable, \IteratorAggregate, \A
     /**
      * @return bool
      */
+    public function isFiltered()
+    {
+        return $this->isFiltered;
+    }
+
+    /**
+     * @return bool
+     */
     public function isValid()
     {
         foreach ($this->constraints as $constraint) {
@@ -319,6 +334,8 @@ class ArrayConstraint implements IConstraint, \Countable, \IteratorAggregate, \A
      */
     public function clean()
     {
+        $this->isFiltered = false;
+
         foreach ($this->constraints as $constraint) {
             $constraint->clean();
         }
@@ -421,6 +438,7 @@ class ArrayConstraint implements IConstraint, \Countable, \IteratorAggregate, \A
         }
 
         $this->constraints = $constraints;
+        $this->isFiltered = false;
 
         $this->iterator = clone $this->iterator;
     }

@@ -99,7 +99,24 @@ class VariableIterator implements \Iterator
      */
     public function valid()
     {
-        return array_key_exists($this->currentKey, $this->items);
+        return $this->isValidKey($this->currentKey) ? array_key_exists($this->currentKey, $this->items) : false;
+    }
+
+    /**
+     * @param mixed $key
+     * @return bool
+     */
+    protected function isValidKey($key)
+    {
+        if (is_string($key)) {
+            return true;
+        }
+
+        if (is_int($key)) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -111,6 +128,7 @@ class VariableIterator implements \Iterator
     public function rewind()
     {
         $keys = array_keys($this->items);
-        $this->currentKey = reset($keys);
+
+        $this->currentKey = !empty($keys) ? reset($keys) : null;
     }
 }

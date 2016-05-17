@@ -370,4 +370,21 @@ class ListConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
 
         $this->assertNotEquals($constraint, $constraint2);
     }
+
+    public function testIsFiltered()
+    {
+        $constraint = ListConstraint::create()
+            ->declareAsScalar()
+            ->end();
+
+        $this->assertFalse($constraint->isFiltered());
+
+        $constraint->filter(array('abc', 'def'));
+
+        $this->assertTrue($constraint->isFiltered());
+
+        $constraint->clean();
+
+        $this->assertFalse($constraint->isFiltered());
+    }
 }

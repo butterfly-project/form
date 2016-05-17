@@ -25,6 +25,11 @@ class ListConstraint implements IConstraint, \Countable, \IteratorAggregate, \Ar
     protected $parent;
 
     /**
+     * @var bool
+     */
+    protected $isFiltered = false;
+
+    /**
      * @return static
      */
     public static function create()
@@ -77,7 +82,17 @@ class ListConstraint implements IConstraint, \Countable, \IteratorAggregate, \Ar
             $this->constraints[$key]->filter($item);
         }
 
+        $this->isFiltered = true;
+
         return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isFiltered()
+    {
+        return $this->isFiltered;
     }
 
     /**
@@ -192,6 +207,7 @@ class ListConstraint implements IConstraint, \Countable, \IteratorAggregate, \Ar
      */
     public function clean()
     {
+        $this->isFiltered  = false;
         $this->constraints = array();
     }
 
@@ -294,7 +310,8 @@ class ListConstraint implements IConstraint, \Countable, \IteratorAggregate, \Ar
 
     public function __clone()
     {
-        $this->constraints         = array();
+        $this->clean();
+
         $this->constraintPrototype = clone $this->constraintPrototype;
     }
 }

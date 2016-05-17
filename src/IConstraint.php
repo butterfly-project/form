@@ -19,6 +19,11 @@ interface IConstraint
     /**
      * @return bool
      */
+    public function isFiltered();
+
+    /**
+     * @return bool
+     */
     public function isValid();
 
     /**

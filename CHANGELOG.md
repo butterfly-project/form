@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+1.4.0
+-----
+
+Added functionality:
+
+ * Added isFiltered method in IConstraint
+
 1.3.0
 -----
 
