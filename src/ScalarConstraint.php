@@ -214,6 +214,14 @@ class ScalarConstraint implements IConstraint
     /**
      * @return bool
      */
+    public function isFiltered()
+    {
+        return $this->hasValue(IConstraint::VALUE_BEFORE);
+    }
+
+    /**
+     * @return bool
+     */
     public function isValid()
     {
         return empty($this->errorMessages);

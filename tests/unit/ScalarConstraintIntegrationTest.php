@@ -237,4 +237,19 @@ class ScalarConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($constraint->hasValue(IConstraint::VALUE_BEFORE));
         $this->assertFalse($constraint->hasValue(IConstraint::VALUE_AFTER));
     }
+
+    public function testIsFiltered()
+    {
+        $constraint = ScalarConstraint::create();
+
+        $this->assertFalse($constraint->isFiltered());
+
+        $constraint->filter('abc');
+
+        $this->assertTrue($constraint->isFiltered());
+
+        $constraint->clean();
+
+        $this->assertFalse($constraint->isFiltered());
+    }
 }

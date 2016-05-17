@@ -636,4 +636,19 @@ class ArrayConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($constraint->isValid());
     }
+
+    public function testIsFiltered()
+    {
+        $constraint = ArrayConstraint::create();
+
+        $this->assertFalse($constraint->isFiltered());
+
+        $constraint->filter(array('foo' => 'bar'));
+
+        $this->assertTrue($constraint->isFiltered());
+
+        $constraint->clean();
+
+        $this->assertFalse($constraint->isFiltered());
+    }
 }
