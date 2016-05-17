@@ -24,6 +24,11 @@ interface IConstraint
     /**
      * @return array
      */
+    public function getStructuredErrorMessages();
+
+    /**
+     * @return array
+     */
     public function getErrorMessages();
 
     /**

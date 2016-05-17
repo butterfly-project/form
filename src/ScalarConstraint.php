@@ -222,6 +222,14 @@ class ScalarConstraint implements IConstraint
     /**
      * @return array
      */
+    public function getStructuredErrorMessages()
+    {
+        return $this->errorMessages;
+    }
+
+    /**
+     * @return array
+     */
     public function getErrorMessages()
     {
         return $this->errorMessages;
