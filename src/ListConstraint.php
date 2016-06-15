@@ -99,7 +99,13 @@ class ListConstraint implements IConstraint, \Countable, \IteratorAggregate, \Ar
      */
     public function getStructuredErrorMessages()
     {
-        return array();
+        $messages = array();
+
+        foreach ($this->constraints as $constraint) {
+            $messages[] = $constraint->getStructuredErrorMessages();
+        }
+
+        return $messages;
     }
 
     /**

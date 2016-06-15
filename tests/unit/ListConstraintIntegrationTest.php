@@ -5,8 +5,10 @@ namespace Butterfly\Component\Form\Tests;
 use Butterfly\Component\Form\ArrayConstraint;
 use Butterfly\Component\Form\IConstraint;
 use Butterfly\Component\Form\ListConstraint;
+use Butterfly\Component\Form\ScalarConstraint;
 use Butterfly\Component\Form\Transform\Trim;
 use Butterfly\Component\Form\Validation\IsNotEmpty;
+use Butterfly\Component\Form\Validation\StringLength;
 use Butterfly\Component\Form\Validation\Type;
 
 /**
@@ -369,5 +371,32 @@ class ListConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
         $constraint->filter(array('abc', ''));
 
         $this->assertNotEquals($constraint, $constraint2);
+    }
+
+    public function testGetStructuredErrorMessages()
+    {
+        $constraint = ListConstraint::create()
+            ->declareAsScalar()
+                ->addValidator(new StringLength(3, StringLength::GREATER), 'incorrect value 1')
+                ->addValidator(new StringLength(5, StringLength::GREATER), 'incorrect value 2')
+            ->end();
+
+        $constraint->filter(array('ab', 'cd', 'ef'));
+
+        $expectedErrorMessages = array(
+            array(
+                'incorrect value 1',
+                'incorrect value 2',
+            ),
+            array(
+                'incorrect value 1',
+                'incorrect value 2',
+            ),
+            array(
+                'incorrect value 1',
+                'incorrect value 2',
+            ),
+        );
+        $this->assertEquals($expectedErrorMessages, $constraint->getStructuredErrorMessages());
     }
 }
