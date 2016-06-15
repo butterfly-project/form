@@ -20,7 +20,9 @@ use Butterfly\Component\Form\Transform\Trim;
 use Butterfly\Component\Form\Transform\ToType;
 use Butterfly\Component\Form\Validation\IsNotEmpty;
 use Butterfly\Component\Form\Validation\IsNotNull;
+use Butterfly\Component\Form\Validation\IsNull;
 use Butterfly\Component\Form\Validation\StringLength as StringLengthValidator;
+use Butterfly\Component\Form\Validation\Type;
 
 /**
  * @author Marat Fakhertdinov <marat.fakhertdinov@gmail.com>
@@ -120,6 +122,25 @@ class ArrayConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($expectedResult, $constraint->isValid());
         $this->assertCount($expectedCountErrors, $constraint->getErrorMessages());
+    }
+
+    public function testFilterIfKeyIsNull()
+    {
+        $constraint = ArrayConstraint::create()
+            ->addScalarConstraint('subject')
+                ->addValidator(new IsNull(), 'Incorrect subject')
+            ->end()
+            ->addScalarConstraint('body')
+                ->addValidator(new IsNull(), 'Incorrect body')
+            ->end();
+
+        $constraint->filter(array(
+            'subject' => null,
+            'body' => null,
+        ));
+
+        $this->assertTrue($constraint->isValid());
+        $this->assertCount(0, $constraint->getErrorMessages());
     }
 
     public function testHasValue()
@@ -230,6 +251,56 @@ class ArrayConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
         $constraint->filter(array('caption' => ' abc  '));
 
         $this->assertNull($constraint->getFirstErrorMessage());
+    }
+
+    public function testGetStructuredErrorMessages()
+    {
+        $constraint = ArrayConstraint::create()
+            ->addScalarConstraint('title')
+                ->addValidator(new Type(Type::TYPE_STRING), 'incorrect title')
+            ->end()
+            ->addScalarConstraint('caption')
+                ->addValidator(new Type(Type::TYPE_STRING), 'incorrect caption 1')
+                ->addValidator(new Type(Type::TYPE_STRING), 'incorrect caption 2')
+            ->end()
+            ->addArrayConstraint('phones')
+                ->addScalarConstraint('phone1')
+                    ->addValidator(new Type(Type::TYPE_INT), 'Incorrect phone1 - error 1')
+                    ->addValidator(new Type(Type::TYPE_INT), 'Incorrect phone1 - error 2')
+                ->end()
+                ->addScalarConstraint('phone2')
+                    ->addValidator(new Type(Type::TYPE_INT), 'Incorrect phone2')
+                ->end()
+            ->end()
+        ;
+
+        $constraint->filter(array(
+            'title' => 'title',
+            'caption' => 1234,
+            'phones' => array(
+                'phone1' => 'incorrect_value',
+                'phone2' => 'incorrect_value',
+            ),
+        ));
+
+        $expectedErrorMessages = array(
+            'title' => array(),
+            'caption' => array(
+                'incorrect caption 1',
+                'incorrect caption 2',
+            ),
+            'phones' => array(
+                'phone1' => array(
+                    'Incorrect phone1 - error 1',
+                    'Incorrect phone1 - error 2',
+                ),
+                'phone2' => array(
+                    'Incorrect phone2'
+                ),
+            ),
+        );
+
+        $this->assertEquals($expectedErrorMessages, $constraint->getStructuredErrorMessages());
     }
 
     public function testCount()

@@ -112,6 +112,20 @@ class ListConstraint implements IConstraint, \Countable, \IteratorAggregate, \Ar
     /**
      * @return array
      */
+    public function getStructuredErrorMessages()
+    {
+        $messages = array();
+
+        foreach ($this->constraints as $constraint) {
+            $messages[] = $constraint->getStructuredErrorMessages();
+        }
+
+        return $messages;
+    }
+
+    /**
+     * @return array
+     */
     public function getErrorMessages()
     {
         $messages = array();
