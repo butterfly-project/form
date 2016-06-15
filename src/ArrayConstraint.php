@@ -302,6 +302,20 @@ class ArrayConstraint implements IConstraint, \Countable, \IteratorAggregate, \A
     /**
      * @return array
      */
+    public function getStructuredErrorMessages()
+    {
+        $messages = array();
+
+        foreach ($this->constraints as $key => $constraint) {
+            $messages[$key] = $constraint->getStructuredErrorMessages();
+        }
+
+        return $messages;
+    }
+
+    /**
+     * @return array
+     */
     public function getErrorMessages()
     {
         $messages = array();

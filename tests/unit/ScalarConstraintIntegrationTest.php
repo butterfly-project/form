@@ -99,6 +99,21 @@ class ScalarConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('incorrect value', $constraint->getFirstErrorMessage());
     }
 
+    public function testGetStructuredErrorMessages()
+    {
+        $constraint = ScalarConstraint::create()
+            ->addValidator(new StringLengthValidator(3, StringLengthValidator::GREATER), 'incorrect value 1')
+            ->addValidator(new StringLengthValidator(5, StringLengthValidator::GREATER), 'incorrect value 2');
+
+        $constraint->filter('ab');
+
+        $expectedErrorMessages = array(
+            'incorrect value 1',
+            'incorrect value 2',
+        );
+        $this->assertEquals($expectedErrorMessages, $constraint->getStructuredErrorMessages());
+    }
+
     public function testMoreValidators()
     {
         $constraint = ScalarConstraint::create()

@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+1.5.0
+-----
+
+Added functionality:
+
+ * Added structured error messages
+
 1.4.0
 -----
 
