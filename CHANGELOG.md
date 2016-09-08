@@ -6,6 +6,7 @@ CHANGELOG
 
 Added functionality:
 
+ * Added LetterCase transformer
  * Upgrade phpunit to version 5.5
  
 
