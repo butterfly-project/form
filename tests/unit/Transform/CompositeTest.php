@@ -29,7 +29,7 @@ class CompositeTest extends \PHPUnit_Framework_TestCase
      */
     protected function getTransformer()
     {
-        $object = $this->getMock('\Butterfly\Component\Form\Transform\ITransformer');
+        $object = $this->createMock('\Butterfly\Component\Form\Transform\ITransformer');
 
         $object
             ->expects($this->once())

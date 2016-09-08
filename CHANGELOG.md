@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+1.6.0
+-----
+
+Added functionality:
+
+ * Upgrade phpunit to version 5.5
+ 
+
 1.5.0
 -----
 
