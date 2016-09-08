@@ -12,9 +12,6 @@ class CompositeTest extends \PHPUnit_Framework_TestCase
 {
     public function getDataForTestCheck()
     {
-        $trueV  = $this->getValidatorWithReturn(true);
-        $falseV = $this->getValidatorWithReturn(false);
-
         return array(
             // empty array
             array(Composite::TYPE_AND, array(), true, 'check composite type "and" for empty array - success'),
@@ -23,45 +20,45 @@ class CompositeTest extends \PHPUnit_Framework_TestCase
 
 
             // one validator
-            array(Composite::TYPE_AND, array($trueV), true, 'check composite type "and" for "true" - success'),
-            array(Composite::TYPE_AND, array($falseV), false, 'check composite type "and" for "false" - fail'),
+            array(Composite::TYPE_AND, array($this->getValidator(true)), true, 'check composite type "and" for "true" - success'),
+            array(Composite::TYPE_AND, array($this->getValidator(false)), false, 'check composite type "and" for "false" - fail'),
 
-            array(Composite::TYPE_OR, array($trueV), true, 'check composite type "or" for "true" - success'),
-            array(Composite::TYPE_OR, array($falseV), false, 'check composite type "or" for "false" - fail'),
+            array(Composite::TYPE_OR, array($this->getValidator(true)), true, 'check composite type "or" for "true" - success'),
+            array(Composite::TYPE_OR, array($this->getValidator(false)), false, 'check composite type "or" for "false" - fail'),
 
-            array(Composite::TYPE_XOR, array($trueV), true, 'check composite type "xor" for "true" - success'),
-            array(Composite::TYPE_XOR, array($falseV), false, 'check composite type "xor" for "false" - fail'),
+            array(Composite::TYPE_XOR, array($this->getValidator(true)), true, 'check composite type "xor" for "true" - success'),
+            array(Composite::TYPE_XOR, array($this->getValidator(false)), false, 'check composite type "xor" for "false" - fail'),
 
 
             // two validators
-            array(Composite::TYPE_AND, array($trueV, $trueV), true, 'check composite type "and" for "true-true" - success'),
-            array(Composite::TYPE_AND, array($trueV, $falseV), false, 'check composite type "and" for "true-false" - fail'),
-            array(Composite::TYPE_AND, array($falseV, $falseV), false, 'check composite type "and" for "false-false" - fail'),
+            array(Composite::TYPE_AND, array($this->getValidator(true), $this->getValidator(true)), true, 'check composite type "and" for "true-true" - success'),
+            array(Composite::TYPE_AND, array($this->getValidator(true), $this->getValidator(false)), false, 'check composite type "and" for "true-false" - fail'),
+            array(Composite::TYPE_AND, array($this->getValidator(false), $this->getValidator(false)), false, 'check composite type "and" for "false-false" - fail'),
 
-            array(Composite::TYPE_OR, array($trueV, $trueV), true, 'check composite type "or" for "true-true" - success'),
-            array(Composite::TYPE_OR, array($trueV, $falseV), true, 'check composite type "or" for "true-false" - success'),
-            array(Composite::TYPE_OR, array($falseV, $falseV), false, 'check composite type "or" for "false-false" - fail'),
+            array(Composite::TYPE_OR, array($this->getValidator(true), $this->getValidator(true)), true, 'check composite type "or" for "true-true" - success'),
+            array(Composite::TYPE_OR, array($this->getValidator(true), $this->getValidator(false)), true, 'check composite type "or" for "true-false" - success'),
+            array(Composite::TYPE_OR, array($this->getValidator(false), $this->getValidator(false)), false, 'check composite type "or" for "false-false" - fail'),
 
-            array(Composite::TYPE_XOR, array($trueV, $trueV), false, 'check composite type "xor" for "true-true" - fail'),
-            array(Composite::TYPE_XOR, array($trueV, $falseV), true, 'check composite type "xor" for "true-false" - success'),
-            array(Composite::TYPE_XOR, array($falseV, $falseV), false, 'check composite type "xor" for "false-false" - fail'),
+            array(Composite::TYPE_XOR, array($this->getValidator(true), $this->getValidator(true)), false, 'check composite type "xor" for "true-true" - fail'),
+            array(Composite::TYPE_XOR, array($this->getValidator(true), $this->getValidator(false)), true, 'check composite type "xor" for "true-false" - success'),
+            array(Composite::TYPE_XOR, array($this->getValidator(false), $this->getValidator(false)), false, 'check composite type "xor" for "false-false" - fail'),
 
 
             // three validators
-            array(Composite::TYPE_AND, array($trueV, $trueV, $trueV), true, 'check composite type "and" for "true-true-true" - success'),
-            array(Composite::TYPE_AND, array($trueV, $trueV, $falseV), false, 'check composite type "and" for "true-true-false" - fail'),
-            array(Composite::TYPE_AND, array($trueV, $falseV, $falseV), false, 'check composite type "and" for "true-false-false" - fail'),
-            array(Composite::TYPE_AND, array($falseV, $falseV, $falseV), false, 'check composite type "and" for "false-false-false" - fail'),
+            array(Composite::TYPE_AND, array($this->getValidator(true), $this->getValidator(true), $this->getValidator(true)), true, 'check composite type "and" for "true-true-true" - success'),
+            array(Composite::TYPE_AND, array($this->getValidator(true), $this->getValidator(true), $this->getValidator(false)), false, 'check composite type "and" for "true-true-false" - fail'),
+            array(Composite::TYPE_AND, array($this->getValidator(true), $this->getValidator(false), $this->getValidator(false)), false, 'check composite type "and" for "true-false-false" - fail'),
+            array(Composite::TYPE_AND, array($this->getValidator(false), $this->getValidator(false), $this->getValidator(false)), false, 'check composite type "and" for "false-false-false" - fail'),
 
-            array(Composite::TYPE_OR, array($trueV, $trueV, $trueV), true, 'check composite type "or" for "true-true-true" - success'),
-            array(Composite::TYPE_OR, array($trueV, $trueV, $falseV), true, 'check composite type "or" for "true-true-false" - success'),
-            array(Composite::TYPE_OR, array($trueV, $falseV, $falseV), true, 'check composite type "or" for "true-false-false" - success'),
-            array(Composite::TYPE_OR, array($falseV, $falseV, $falseV), false, 'check composite type "or" for "false-false-false" - fail'),
+            array(Composite::TYPE_OR, array($this->getValidator(true), $this->getValidator(true), $this->getValidator(true)), true, 'check composite type "or" for "true-true-true" - success'),
+            array(Composite::TYPE_OR, array($this->getValidator(true), $this->getValidator(true), $this->getValidator(false)), true, 'check composite type "or" for "true-true-false" - success'),
+            array(Composite::TYPE_OR, array($this->getValidator(true), $this->getValidator(false), $this->getValidator(false)), true, 'check composite type "or" for "true-false-false" - success'),
+            array(Composite::TYPE_OR, array($this->getValidator(false), $this->getValidator(false), $this->getValidator(false)), false, 'check composite type "or" for "false-false-false" - fail'),
 
-            array(Composite::TYPE_XOR, array($trueV, $trueV, $trueV), true, 'check composite type "xor" for "true-true-true" - success'),
-            array(Composite::TYPE_XOR, array($trueV, $trueV, $falseV), false, 'check composite type "xor" for "true-true-false" - fail'),
-            array(Composite::TYPE_XOR, array($trueV, $falseV, $falseV), true, 'check composite type "xor" for "true-false-false" - success'),
-            array(Composite::TYPE_XOR, array($falseV, $falseV, $falseV), false, 'check composite type "xor" for "false-false-false" - fail'),
+            array(Composite::TYPE_XOR, array($this->getValidator(true), $this->getValidator(true), $this->getValidator(true)), true, 'check composite type "xor" for "true-true-true" - success'),
+            array(Composite::TYPE_XOR, array($this->getValidator(true), $this->getValidator(true), $this->getValidator(false)), false, 'check composite type "xor" for "true-true-false" - fail'),
+            array(Composite::TYPE_XOR, array($this->getValidator(true), $this->getValidator(false), $this->getValidator(false)), true, 'check composite type "xor" for "true-false-false" - success'),
+            array(Composite::TYPE_XOR, array($this->getValidator(false), $this->getValidator(false), $this->getValidator(false)), false, 'check composite type "xor" for "false-false-false" - fail'),
         );
     }
 
@@ -86,14 +83,12 @@ class CompositeTest extends \PHPUnit_Framework_TestCase
      * @param bool $returnValue
      * @return IValidator
      */
-    protected function getValidatorWithReturn($returnValue)
+    protected function getValidator($returnValue)
     {
-        $validator = $this->getValidator();
+        $validator = $this->createValidator();
 
         $validator
-            ->expects($this->any())
             ->method('check')
-            ->withAnyParameters()
             ->willReturn($returnValue);
 
         return $validator;
@@ -101,14 +96,14 @@ class CompositeTest extends \PHPUnit_Framework_TestCase
 
     public function testAddValidator()
     {
-        $validator1 = $this->getValidator();
+        $validator1 = $this->createValidator();
         $validator1
             ->expects($this->once())
             ->method('check')
             ->withAnyParameters()
             ->willReturn(true);
 
-        $validator2 = $this->getValidator();
+        $validator2 = $this->createValidator();
         $validator2
             ->expects($this->once())
             ->method('check')
@@ -129,8 +124,8 @@ class CompositeTest extends \PHPUnit_Framework_TestCase
     public function testCheckIfIncorrectOperation()
     {
         $validators = array(
-            $this->getValidator(),
-            $this->getValidator(),
+            $this->createValidator(),
+            $this->createValidator(),
         );
 
         $validator = new Composite('undefined', $validators);
@@ -141,8 +136,8 @@ class CompositeTest extends \PHPUnit_Framework_TestCase
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|IValidator
      */
-    protected function getValidator()
+    protected function createValidator()
     {
-        return $this->getMock('\Butterfly\Component\Form\Validation\IValidator');
+        return $this->createMock('\Butterfly\Component\Form\Validation\IValidator');
     }
 }

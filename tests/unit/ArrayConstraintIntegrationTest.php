@@ -199,7 +199,7 @@ class ArrayConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
      */
     protected function getArrayConstraint()
     {
-        return $this->getMock('\Butterfly\Component\Form\ArrayConstraint');
+        return $this->createMock('\Butterfly\Component\Form\ArrayConstraint');
     }
 
     public function testRemoveConstraint()
