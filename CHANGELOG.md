@@ -7,6 +7,7 @@ CHANGELOG
 Added functionality:
 
  * Added LetterCase transformer
+ * Added JsonEncode, JsonDecode transformer
  * Upgrade phpunit to version 5.5
  
 
