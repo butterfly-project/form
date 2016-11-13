@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+1.7.0
+-----
+
+Added functionality:
+
+ * Added StrReplace, RegReplace transformer
+
 1.6.0
 -----
 
@@ -9,7 +16,6 @@ Added functionality:
  * Added LetterCase transformer
  * Added JsonEncode, JsonDecode transformer
  * Upgrade phpunit to version 5.5
- 
 
 1.5.0
 -----
