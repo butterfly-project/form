@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+1.8.0
+-----
+
+Added functionality:
+
+ * Update ArrayCount validator: added Operator option
+
 1.7.0
 -----
 

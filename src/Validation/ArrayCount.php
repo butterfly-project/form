@@ -7,17 +7,31 @@ namespace Butterfly\Component\Form\Validation;
  */
 class ArrayCount implements IValidator
 {
+    const EQUAL = '=';
+    const NOT_EQUAL = '!=';
+    const LESS = '<';
+    const GREATER = '>';
+    const LESS_OR_EQUAL = '<=';
+    const GREATER_OR_EQUAL = '>=';
+
     /**
      * @var int
      */
-    protected $count;
+    protected $expected;
 
     /**
-     * @param int $count
+     * @var string
      */
-    public function __construct($count)
+    protected $operator;
+
+    /**
+     * @param int $expected
+     * @param string $operator
+     */
+    public function __construct($expected, $operator = self::EQUAL)
     {
-        $this->count = (int)$count;
+        $this->expected = (int)$expected;
+        $this->operator = $operator;
     }
 
     /**
@@ -31,6 +45,23 @@ class ArrayCount implements IValidator
             throw new \InvalidArgumentException(sprintf("Expected array, given: %s", var_export($value, true)));
         }
 
-        return count($value) == $this->count;
+        $count = count($value);
+
+        switch ($this->operator) {
+            case static::EQUAL:
+                return $count == $this->expected;
+            case static::NOT_EQUAL:
+                return $count != $this->expected;
+            case static::LESS:
+                return $count < $this->expected;
+            case static::GREATER:
+                return $count > $this->expected;
+            case static::LESS_OR_EQUAL:
+                return $count <= $this->expected;
+            case static::GREATER_OR_EQUAL:
+                return $count >= $this->expected;
+            default:
+                throw new \InvalidArgumentException(sprintf('Operator %s is not found', $this->operator));
+        }
     }
 }
