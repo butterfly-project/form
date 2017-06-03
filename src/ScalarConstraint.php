@@ -2,6 +2,7 @@
 
 namespace Butterfly\Component\Form;
 
+use Butterfly\Component\Form\Filter\BreakIfFilter;
 use Butterfly\Component\Form\Filter\CallableTransformerAdapter;
 use Butterfly\Component\Form\Filter\CallableValidatorAdapter;
 use Butterfly\Component\Form\Filter\RestoreValueFilter;
@@ -117,6 +118,18 @@ class ScalarConstraint implements IConstraint
     }
 
     /**
+     * @param IValidator $validator
+     * @param mixed $source
+     * @return $this
+     */
+    public function breakIf(IValidator $validator, $source = BreakIfFilter::SOURCE_VALUE)
+    {
+        $this->filters[] = new BreakIfFilter($validator, $source);
+
+        return $this;
+    }
+
+    /**
      * @param mixed $label
      * @return ScalarConstraint
      */
@@ -164,6 +177,19 @@ class ScalarConstraint implements IConstraint
                 $this->values[$filter->getLabel()] = $value;
             } elseif ($filter instanceof RestoreValueFilter) {
                 $value = $this->getValue($filter->getLabel());
+            } elseif ($filter instanceof BreakIfFilter) {
+                $source = $filter->getSource();
+                if ($source == BreakIfFilter::SOURCE_VALUE) {
+                    $result = $filter->check($value);
+                } elseif ($source == BreakIfFilter::SOURCE_CONSTRAINT) {
+                    $result = $filter->check($this);
+                } else {
+                    $result = $filter->check($source);
+                }
+
+                if ($result) {
+                    break;
+                }
             }
         }
 

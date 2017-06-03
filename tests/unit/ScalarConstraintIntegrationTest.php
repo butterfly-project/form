@@ -8,6 +8,7 @@ use Butterfly\Component\Form\ScalarConstraint;
 use Butterfly\Component\Form\Transform\StringLength as StringLengthTransformer;
 use Butterfly\Component\Form\Transform\Trim;
 use Butterfly\Component\Form\Validation\Compare;
+use Butterfly\Component\Form\Validation\IsEmpty;
 use Butterfly\Component\Form\Validation\IsNotEmpty;
 use Butterfly\Component\Form\Validation\IsNull;
 use Butterfly\Component\Form\Validation\StringLength as StringLengthValidator;
@@ -266,5 +267,20 @@ class ScalarConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
         $constraint->clean();
 
         $this->assertFalse($constraint->isFiltered());
+    }
+
+    public function testBreakIf()
+    {
+        $constraint = ScalarConstraint::create()
+            ->breakIf(new IsEmpty())
+            ->addValidator(new IsNotEmpty(), 'Ошибка');
+
+        $constraint->filter('abc');
+        $this->assertTrue($constraint->isValid());
+        $this->assertEquals('abc', $constraint->getValue());
+
+        $constraint->filter('');
+        $this->assertTrue($constraint->isValid());
+        $this->assertEquals('', $constraint->getValue());
     }
 }

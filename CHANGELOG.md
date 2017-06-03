@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+1.8.0
+-----
+
+Added functionality:
+
+ * Added BreakIf construction
+
 1.7.0
 -----
 
