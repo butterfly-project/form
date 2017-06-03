@@ -13,7 +13,7 @@ Added functionality:
 
 Added functionality:
 
- * Added BreakIf construction
+ * Update ArrayCount validator: added Operator option
 
 1.7.0
 -----
