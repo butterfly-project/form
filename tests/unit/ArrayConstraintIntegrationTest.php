@@ -722,4 +722,18 @@ class ArrayConstraintIntegrationTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($constraint->isFiltered());
     }
+
+    public function testEmpty()
+    {
+        $constraint = ArrayConstraint::create()
+            ->addListConstraint('list')
+                ->declareAsScalar()
+                    ->addValidator(new IsNotEmpty(), 'incorrect')
+                ->end()
+            ->end();
+
+        $constraint->filter(array());
+
+        $this->assertEquals(array(), $constraint->get('list')->getValue());
+    }
 }
