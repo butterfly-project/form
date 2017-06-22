@@ -170,17 +170,12 @@ class ArrayConstraint implements IConstraint, \Countable, \IteratorAggregate, \A
 
             if ($constraint instanceof SyntheticConstraint) {
                 $fieldValue = $this;
-            } elseif (is_array($value)) {
-                $fieldValue = $this->getArrayValue($value, $key);
-            } elseif ($value instanceof \ArrayAccess) {
-                $fieldValue = $value->offsetExists($key) ? $value->offsetGet($key) : null;
-            } elseif (is_object($value)) {
-                $fieldValue = $this->getObjectValue($value, $key);
             } else {
-                throw new \InvalidArgumentException(sprintf(
-                    "Incrorrect value type. Expected array or object value. Given: %s",
-                    var_export($value, true)
-                ));
+                $fieldValue = $this->getKeyValue($value, $key);
+
+                if ($constraint instanceof ListConstraint && null === $fieldValue) {
+                    $fieldValue = array();
+                }
             }
 
             $constraint->filter($fieldValue);
@@ -189,6 +184,31 @@ class ArrayConstraint implements IConstraint, \Countable, \IteratorAggregate, \A
         $this->isFiltered = true;
 
         return $this;
+    }
+
+    /**
+     * @param mixed $obj
+     * @param string $key
+     * @return mixed|null
+     */
+    protected function getKeyValue($obj, $key)
+    {
+        if (is_array($obj)) {
+            return $this->getArrayValue($obj, $key);
+        }
+
+        if ($obj instanceof \ArrayAccess) {
+            return $obj->offsetExists($key) ? $obj->offsetGet($key) : null;
+        }
+
+        if (is_object($obj)) {
+            return $this->getObjectValue($obj, $key);
+        }
+
+        throw new \InvalidArgumentException(sprintf(
+            "Incrorrect value type. Expected array or object value. Given: %s",
+            var_export($obj, true)
+        ));
     }
 
     /**
@@ -231,7 +251,7 @@ class ArrayConstraint implements IConstraint, \Countable, \IteratorAggregate, \A
         if ($reflectionObject->hasMethod('__get')) {
             $hasMagicIsset = $reflectionObject->hasMethod('__isset');
 
-            if (!$hasMagicIsset || ($hasMagicIsset && isset($value->$key)))  {
+            if (!$hasMagicIsset || ($hasMagicIsset && isset($value->$key))) {
                 return call_user_func(array($value, '__get'), $key);
             }
         }
@@ -452,7 +472,7 @@ class ArrayConstraint implements IConstraint, \Countable, \IteratorAggregate, \A
         }
 
         $this->constraints = $constraints;
-        $this->isFiltered = false;
+        $this->isFiltered  = false;
 
         $this->iterator = clone $this->iterator;
     }

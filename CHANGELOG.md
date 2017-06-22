@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+1.11.0
+-----
+
+Added functionality:
+
+ * Added ListConstraint not available keys support
+
 1.9.0
 -----
 
